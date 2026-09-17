@@ -1,0 +1,27 @@
+---
+interface Props {
+	id: string;
+	title: string;
+	subtitle?: string;
+}
+
+const { id, title, subtitle } = Astro.props;
+---
+
+<section id={id} class="py-24">
+	<div class="mb-12">
+		<h2 class="text-2xl font-light text-neutral-900 mb-2">{title}</h2>
+		{subtitle && <p class="text-sm text-neutral-500">{subtitle}</p>}
+	</div>
+
+	<div
+		class="h-px bg-linear-to-tr from-transparent via-neutral-200 to-transparent mb-12 relative overflow-hidden"
+	>
+		<div
+			class="gsap-animated-line absolute top-0 left-0 h-full w-full bg-linear-to-tr from-neutral-900 via-neutral-600 to-transparent -translate-x-full"
+		>
+		</div>
+	</div>
+
+	<slot />
+</section>
