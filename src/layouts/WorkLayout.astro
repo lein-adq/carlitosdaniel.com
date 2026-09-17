@@ -1,0 +1,124 @@
+---
+import Layout from "./Layout.astro";
+import Chip from "../components/atoms/Chip.astro";
+
+const { frontmatter } = Astro.props;
+---
+
+<Layout title={`${frontmatter.title} | Carlos Daniel`}>
+	<main class="max-w-prose mx-auto px-6 lg:px-0 py-32">
+		<!-- Back link -->
+		<div class="mb-16 reveal">
+			<a
+				href="/"
+				class="text-sm font-mono tracking-wide uppercase text-slate-500 hover:text-slate-900 transition-colors inline-flex items-center gap-2 group"
+			>
+				<span class="transform group-hover:-translate-x-1 transition-transform"
+					>←</span
+				> Back to Index
+			</a>
+		</div>
+
+		<!-- Meta Block -->
+		<header class="mb-24 reveal">
+			<h1 class="text-5xl font-medium tracking-tight mb-8 text-slate-900">
+				{frontmatter.title}
+			</h1>
+
+			<div
+				class="grid grid-cols-2 sm:grid-cols-4 gap-8 border-t border-b border-slate-200 py-8"
+			>
+				<div>
+					<span
+						class="block text-sm font-mono tracking-wide uppercase text-slate-400 mb-1"
+						>Role</span
+					>
+					<span class="text-slate-900 font-medium">{frontmatter.role}</span>
+				</div>
+				<div>
+					<span
+						class="block text-sm font-mono tracking-wide uppercase text-slate-400 mb-1"
+						>Timeline</span
+					>
+					<span class="text-slate-900 font-medium">{frontmatter.timeline}</span>
+				</div>
+				<div class="col-span-2 sm:col-span-2">
+					<span
+						class="block text-sm font-mono tracking-wide uppercase text-slate-400 mb-1"
+						>Stack</span
+					>
+					<div class="flex flex-wrap gap-2">
+						{frontmatter.stack.map((tech: string) => (
+							<Chip>{tech}</Chip>
+						))}
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<!-- The Article -->
+		<article class="text-lg leading-relaxed text-slate-600 reveal mdx-content">
+			<slot />
+		</article>
+	</main>
+</Layout>
+
+<style is:global>
+	.reveal {
+		opacity: 0;
+		transform: translateY(16px);
+		transition:
+			opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+			transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.reveal.is-visible {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	/* MDX Content Styles */
+	.mdx-content h2 {
+		@apply text-3xl font-medium tracking-tight mb-6 text-slate-900 mt-16;
+	}
+	.mdx-content p {
+		@apply mb-6;
+	}
+	.mdx-content ul {
+		@apply space-y-4 list-disc pl-5 my-8;
+	}
+	.mdx-content li strong {
+		@apply text-slate-900;
+	}
+	.mdx-content pre {
+		@apply bg-[#0a0a0a] text-slate-200 p-6 rounded-lg overflow-x-auto font-mono text-sm shadow-xl my-8;
+	}
+	.mdx-content code {
+		@apply bg-slate-100 px-1.5 py-0.5 rounded text-sm font-mono text-slate-800;
+	}
+	.mdx-content pre code {
+		@apply bg-transparent p-0 text-inherit;
+	}
+</style>
+
+<script>
+	const setupReveals = () => {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add("is-visible");
+						observer.unobserve(entry.target);
+					}
+				});
+			},
+			{ rootMargin: "0px", threshold: 0.1 },
+		);
+
+		document
+			.querySelectorAll(".reveal")
+			.forEach((elem) => observer.observe(elem));
+	};
+	setupReveals();
+	document.addEventListener("astro:page-load", setupReveals);
+</script>

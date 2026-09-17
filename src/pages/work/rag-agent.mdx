@@ -1,0 +1,61 @@
+---
+layout: ../../layouts/WorkLayout.astro
+title: End-to-End RAG & AI Agent Service
+role: Lead Architect
+timeline: Q3 2024
+stack:
+  - Python
+  - FastAPI
+  - Pinecone
+  - LangChain
+---
+
+## The Constraint & Objective
+
+Building a Retrieval-Augmented Generation (RAG) pipeline is straightforward; building one that scales elegantly under load while maintaining sub-200ms retrieval latency is not. The objective was to design an AI agent service capable of ingesting thousands of internal documents, indexing them with high-density embeddings, and answering complex user queries with strict source attribution.
+
+## System Architecture
+
+<div class="bg-slate-100 p-8 rounded-lg overflow-x-auto text-sm my-8 group">
+	<div class="font-mono text-slate-500 mb-4 transition-opacity group-hover:text-slate-800">
+		[ User Query ] -> [ FastAPI Gateway ] -> [ Query Reformulation (LLM) ] -> [ Vector Search (Pinecone) ] -> [ Context Assembly ] -> [ Final Generation (LLM) ]
+	</div>
+</div>
+
+The architecture heavily emphasizes decoupling the ingestion pipeline from the query pipeline. Ingestion runs asynchronously via message queues, chunking and embedding documents without blocking the main event loop.
+
+## Key Technical Decisions
+
+- **Async Query Pipeline:** Utilized Python's `asyncio` with FastAPI to ensure that long-running LLM network calls do not block the thread pool, drastically increasing throughput.
+- **Hybrid Search:** Implemented a combination of dense vector embeddings and sparse keyword search (BM25) to improve retrieval accuracy on domain-specific terminology.
+- **Streaming Responses:** Implemented Server-Sent Events (SSE) to stream tokens back to the client immediately, reducing perceived latency to near-zero.
+
+## The Implementation
+
+A crucial part of the performance optimization was managing concurrent LLM calls for query reformulation. Here is a simplified snippet of the async gathering logic:
+
+```python
+async def execute_rag_pipeline(query: str):
+    # 1. Reformulate query
+    optimized_queries = await llm.generate_variations(query)
+    
+    # 2. Concurrent vector searches
+    search_tasks = [
+        vector_db.search_async(q, top_k=3) 
+        for q in optimized_queries
+    ]
+    results = await asyncio.gather(*search_tasks)
+    
+    # 3. Deduplicate and rank
+    context = rank_and_filter(results)
+    
+    # 4. Stream generation
+    return StreamingResponse(
+        llm.stream_answer(query, context), 
+        media_type="text/event-stream"
+    )
+```
+
+## Outcomes
+
+The system successfully reduced P95 retrieval latency by 40% compared to the naive implementation, while the hybrid search approach increased the MRR (Mean Reciprocal Rank) of the retrieved contexts by 22%.
