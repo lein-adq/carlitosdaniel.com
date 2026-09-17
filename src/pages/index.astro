@@ -1,11 +1,262 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Section from '../components/organisms/Section.astro';
+import ProjectCard from '../components/molecules/ProjectCard.astro';
+import ExperienceCard from '../components/molecules/ExperienceCard.astro';
+import TestimonialCard from '../components/molecules/TestimonialCard.astro';
+import Button from '../components/atoms/Button.astro';
+import Chip from '../components/atoms/Chip.astro';
+import Link from '../components/atoms/Link.astro';
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Carlos Daniel - Software Engineer">
+	<main class="max-w-4xl mx-auto px-6">
+		
+		<!-- Hero Section -->
+		<section id="hero" class="min-h-screen flex flex-col justify-center pt-0">
+			<div class="gsap-hero-container grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+				<div class="order-2 lg:order-1 col-span-1 lg:col-span-8">
+					<div class="gsap-hero-item mb-6 text-xs font-mono text-neutral-500 tracking-wide">
+						Backend & Infrastructure Engineer
+					</div>
+
+					<h1 class="gsap-hero-item text-5xl md:text-6xl font-light text-neutral-900 leading-tight mb-8 tracking-tight">
+						Building infrastructure<br />
+						that scales.<br />
+						<span class="text-neutral-400">So your team can focus</span><br />
+						<span class="text-neutral-400">on shipping product.</span>
+					</h1>
+
+					<div class="gsap-hero-item max-w-xl text-neutral-600 leading-relaxed mb-8 space-y-4">
+						<p class="text-sm">
+							You need systems that won't buckle under pressure. I design and build highly available, real-time architectures using Python, Go, and AWS—ensuring your platform remains fast, reliable, and cost-effective.
+						</p>
+						<p class="text-sm">
+							From integrating complex AI/RAG pipelines to removing performance bottlenecks, I help engineering teams turn architectural challenges into robust solutions.
+						</p>
+					</div>
+
+					<div class="gsap-hero-item mb-12 flex items-center gap-4">
+						<Button href="#contact" variant="primary">
+							Let's chat
+						</Button>
+						<Button href="/resume.pdf" variant="secondary" target="_blank">
+							View Resume
+						</Button>
+					</div>
+
+					<div class="gsap-hero-item flex flex-wrap gap-3 text-xs font-mono">
+						<Chip>TypeScript</Chip>
+						<Chip>Python</Chip>
+						<Chip>Go</Chip>
+						<Chip>SQLite</Chip>
+						<Chip>AWS</Chip>
+						<Chip>AI/RAG</Chip>
+					</div>
+				</div>
+				
+				<div class="order-1 lg:order-2 col-span-1 lg:col-span-4 gsap-hero-item w-full flex justify-center lg:justify-end">
+					<!-- Visual Placeholder -->
+					<div class="w-48 h-48 md:w-64 md:h-64 rounded-2xl bg-neutral-100 border border-neutral-200 overflow-hidden flex flex-col items-center justify-center text-neutral-400 relative group">
+						<div class="absolute inset-0 bg-linear-to-tr from-neutral-200/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+						<svg class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+						<span class="text-xs font-mono text-center px-4">Profile Photo /<br />Abstract Visual</span>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Selected Projects Section -->
+		<Section 
+			id="projects" 
+			title="Selected Projects" 
+			subtitle="Production systems exploring complex constraints and efficient architectures."
+		>
+			<div class="space-y-24">
+				<!-- Project 1 -->
+				<ProjectCard
+					title="End-to-End RAG & AI Agent Service"
+					href="/work/rag-agent"
+					year="2024"
+					description="A high-throughput retrieval-augmented generation pipeline ensuring sub-200ms latency for complex queries, using concurrent vectors searches and streaming SSE responses."
+					tags={["Python", "FastAPI", "Vector DB"]}
+				>
+					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+					<Fragment slot="placeholder-text">Architecture Diagram Placeholder</Fragment>
+				</ProjectCard>
+
+				<!-- Project 2 -->
+				<ProjectCard
+					title="Browser Cookie Tree CLI"
+					href="/work/cookie-cli"
+					year="2023"
+					description="A local-first terminal application for deeply inspecting and visualizing browser cookie structures directly from SQLite databases."
+					tags={["Go", "Rust", "SQLite"]}
+				>
+					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+					<Fragment slot="placeholder-text">Terminal CLI GIF Placeholder</Fragment>
+				</ProjectCard>
+
+				<!-- Project 3 -->
+				<ProjectCard
+					title="Zero-Cost Video Infrastructure"
+					href="/work/loom-clone"
+					year="2023"
+					description="A personal Loom clone architected within AWS Free Tier limits using aggressively optimized temporary TTL patterns to purge ephemeral data."
+					tags={["AWS S3", "DynamoDB", "Serverless"]}
+				>
+					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+					<Fragment slot="placeholder-text">Video Dashboard / AWS Flow Placeholder</Fragment>
+				</ProjectCard>
+			</div>
+		</Section>
+
+		<!-- Experience Section -->
+		<Section
+			id="experience"
+			title="Experience"
+			subtitle="Building production systems across different scales."
+		>
+			<div class="space-y-12">
+				<ExperienceCard
+					role="Senior Software Engineer"
+					period="2021 — Present"
+					company="Tech Company Inc."
+					description="Led the architecture of a high-throughput event-driven microservices platform. Optimized core databases, reducing latency by 40% across major endpoints."
+				/>
+			</div>
+		</Section>
+
+		<!-- Testimonials Section -->
+		<Section
+			id="testimonials"
+			title="What People Say"
+			subtitle="Feedback from colleagues and engineering leaders."
+		>
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<TestimonialCard
+					quote="Carlos is a rare engineer who not only understands deep backend complexity but also cares about the business outcomes. He completely transformed our data pipeline, reducing costs by 30% while improving latency."
+					name="Jane Doe"
+					role="VP of Engineering"
+				/>
+				<TestimonialCard
+					quote="Working with him on the microservices migration was incredibly smooth. He brings a level of rigor to architecture discussions that elevates the whole team."
+					name="John Smith"
+					role="Staff Engineer"
+				/>
+			</div>
+		</Section>
+
+		<!-- Contact Section -->
+		<Section
+			id="contact"
+			title="Get in Touch"
+			subtitle="Open to interesting engineering challenges and technical discussions."
+		>
+			<div class="space-y-2 gsap-project-item">
+				<div class="text-sm text-neutral-900 hover:opacity-70 transition-opacity cursor-pointer">
+					carlos.daniel.development@gmail.com
+				</div>
+				<div class="text-xs text-neutral-500">
+					La Paz, Bolivia · English & Spanish
+				</div>
+			</div>
+		</Section>
+
+		<footer class="py-12 border-t border-neutral-100 flex justify-between items-center text-xs font-mono text-neutral-400">
+			<div>&copy; {new Date().getFullYear()}</div>
+			<div class="flex gap-6">
+				<Link href="#">GitHub</Link>
+				<Link href="#">LinkedIn</Link>
+			</div>
+		</footer>
+
+		<!-- Custom Cursor -->
+		<div id="custom-cursor" class="fixed top-0 left-0 w-20 h-20 bg-neutral-900 text-white rounded-full flex items-center justify-center text-[10px] uppercase tracking-widest font-medium pointer-events-none z-50 opacity-0 scale-50 -translate-x-1/2 -translate-y-1/2 mix-blend-difference">
+			View
+		</div>
+	</main>
 </Layout>
+
+<script>
+	import gsap from 'gsap';
+	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+	// Wait for DOM
+	document.addEventListener('DOMContentLoaded', () => {
+		
+		// 1. Hero Stagger Animation (replacing Framer Motion containerVariants & itemVariants)
+		gsap.set('.gsap-hero-item', { opacity: 0, y: 20 });
+		gsap.to('.gsap-hero-item', {
+			opacity: 1,
+			y: 0,
+			duration: 0.8,
+			ease: 'power2.out',
+			stagger: 0.15,
+			delay: 0.2
+		});
+
+		// 2. Animated Line intersection triggers
+		const animatedLines = document.querySelectorAll('.gsap-animated-line');
+		animatedLines.forEach((line) => {
+			ScrollTrigger.create({
+				trigger: line.parentElement, // Trigger on the container
+				start: 'top 85%', // When the top of the container hits 85% of the viewport height
+				onEnter: () => {
+					gsap.to(line, {
+						x: '0%', 
+						duration: 1.2, 
+						ease: 'power3.out'
+					});
+				},
+				once: true // Only animate once
+			});
+		});
+
+		// 3. Project Items Reveal
+		const projectItems = document.querySelectorAll('.gsap-project-item');
+		projectItems.forEach((item) => {
+			gsap.fromTo(item, 
+				{ opacity: 0, y: 15 },
+				{
+					opacity: 1,
+					y: 0,
+					duration: 0.6,
+					ease: 'power2.out',
+					scrollTrigger: {
+						trigger: item,
+						start: 'top 90%',
+						once: true
+					}
+				}
+			);
+		});
+
+		// 4. Custom Cursor Logic
+		const cursor = document.getElementById('custom-cursor');
+		const hoverElements = document.querySelectorAll('.project-image-hover');
+
+		if (cursor && window.matchMedia("(pointer: fine)").matches) {
+			// Track mouse position globally
+			document.addEventListener('mousemove', (e) => {
+				gsap.to(cursor, {
+					x: e.clientX,
+					y: e.clientY,
+					duration: 0.15,
+					ease: 'power2.out'
+				});
+			});
+
+			// Expand cursor on specific hover elements
+			hoverElements.forEach(el => {
+				el.addEventListener('mouseenter', () => {
+					gsap.to(cursor, { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(1.5)' });
+				});
+				el.addEventListener('mouseleave', () => {
+					gsap.to(cursor, { opacity: 0, scale: 0.5, duration: 0.3, ease: 'power2.in' });
+				});
+			});
+		}
+
+	});
+</script>
