@@ -7,10 +7,13 @@ import NavLink from '../atoms/NavLink.astro';
 	class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/0 backdrop-blur-none border-b border-transparent"
 >
 	<div
-		class="mx-auto max-w-4xl px-6 py-6 flex items-center justify-between"
+		class="mx-auto max-w-4xl px-6 py-5 sm:py-6 flex items-center justify-between gap-4"
 	>
-		<Logo href="/">Carlos Daniel</Logo>
-		<nav aria-label="Primary" class="flex items-center gap-5 sm:gap-8">
+		<Logo href="/">
+			<span class="sr-only sm:not-sr-only">Carlos Daniel</span>
+			<span aria-hidden="true" class="sm:hidden">CD</span>
+		</Logo>
+		<nav aria-label="Primary" class="flex items-center gap-5 sm:gap-8 whitespace-nowrap">
 			<NavLink href="/#projects">Projects</NavLink>
 			<NavLink href="/#experience">Experience</NavLink>
 			<NavLink href="/#contact">Contact</NavLink>
