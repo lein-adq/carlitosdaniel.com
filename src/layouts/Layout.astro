@@ -1,5 +1,5 @@
 ---
-import "@fontsource-variable/inter";
+import "@fontsource-variable/ibm-plex-sans";
 import "@fontsource-variable/jetbrains-mono";
 import "../styles/global.css";
 import Header from "../components/organisms/Header.astro";
@@ -9,8 +9,22 @@ interface Props {
 	description?: string;
 }
 
-const { title, description = "Carlos Daniel - Software Engineer" } =
-	Astro.props;
+const {
+	title,
+	description = "Carlos Daniel is a backend and infrastructure engineer building highly available, real-time systems with Python, Go, and AWS.",
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@type": "Person",
+	name: "Carlos Daniel",
+	url: Astro.site?.toString(),
+	jobTitle: "Backend & Infrastructure Engineer",
+	address: { "@type": "PostalAddress", addressLocality: "La Paz", addressCountry: "BO" },
+	knowsLanguage: ["en", "es"],
+};
 ---
 
 <!doctype html>
@@ -19,13 +33,33 @@ const { title, description = "Carlos Daniel - Software Engineer" } =
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="canonical" href={canonical} />
 		<meta name="generator" content={Astro.generator} />
+		<meta name="theme-color" content="#ffffff" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Carlos Daniel" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	</head>
 	<body
 		class="bg-white text-neutral-900 selection:bg-neutral-200 selection:text-neutral-900 font-sans"
 	>
+		<a
+			href="#main"
+			class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:bg-neutral-900 focus:px-4 focus:py-2 focus:text-sm focus:text-white"
+		>
+			Skip to content
+		</a>
+
 		<Header />
 
 		<slot />
@@ -35,22 +69,17 @@ const { title, description = "Carlos Daniel - Software Engineer" } =
 			import gsap from "gsap";
 			import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-			// Register GSAP ScrollTrigger
 			gsap.registerPlugin(ScrollTrigger);
 
-			// Initialize Lenis
-			const lenis = new Lenis({
-				autoRaf: true,
-				lerp: 0.1, // Smoothness
-			});
+			// Respect users who ask for less motion: keep native scrolling.
+			if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+				const lenis = new Lenis({ lerp: 0.1 });
 
-			// Sync GSAP with Lenis
-			lenis.on("scroll", ScrollTrigger.update);
-
-			gsap.ticker.add((time) => {
-				lenis.raf(time * 1000);
-			});
-			gsap.ticker.lagSmoothing(0);
+				// Drive Lenis from the GSAP ticker (single RAF loop) and keep ScrollTrigger in sync.
+				lenis.on("scroll", ScrollTrigger.update);
+				gsap.ticker.add((time) => lenis.raf(time * 1000));
+				gsap.ticker.lagSmoothing(0);
+			}
 		</script>
 	</body>
 </html>

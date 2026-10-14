@@ -5,8 +5,12 @@ import Chip from "../components/atoms/Chip.astro";
 const { frontmatter } = Astro.props;
 ---
 
-<Layout title={`${frontmatter.title} | Carlos Daniel`}>
-	<main class="max-w-prose mx-auto px-6 lg:px-0 py-32">
+<Layout
+	title={`${frontmatter.title} | Carlos Daniel`}
+	description={frontmatter.description}
+>
+	<noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
+	<main id="main" class="max-w-prose mx-auto px-6 lg:px-0 py-32">
 		<!-- Back link -->
 		<div class="mb-16 reveal">
 			<a
@@ -72,6 +76,14 @@ const { frontmatter } = Astro.props;
 		transition:
 			opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
 			transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.reveal {
+			opacity: 1;
+			transform: none;
+			transition: none;
+		}
 	}
 
 	.reveal.is-visible {

@@ -6,11 +6,10 @@ import ExperienceCard from '../components/molecules/ExperienceCard.astro';
 import TestimonialCard from '../components/molecules/TestimonialCard.astro';
 import Button from '../components/atoms/Button.astro';
 import Chip from '../components/atoms/Chip.astro';
-import Link from '../components/atoms/Link.astro';
 ---
 
 <Layout title="Carlos Daniel - Software Engineer">
-	<main class="max-w-4xl mx-auto px-6">
+	<main id="main" class="max-w-4xl mx-auto px-6">
 		
 		<!-- Hero Section -->
 		<section id="hero" class="min-h-screen flex flex-col justify-center pt-0">
@@ -39,9 +38,6 @@ import Link from '../components/atoms/Link.astro';
 					<div class="gsap-hero-item mb-12 flex items-center gap-4">
 						<Button href="#contact" variant="primary">
 							Let's chat
-						</Button>
-						<Button href="/resume.pdf" variant="secondary" target="_blank">
-							View Resume
 						</Button>
 					</div>
 
@@ -88,7 +84,6 @@ import Link from '../components/atoms/Link.astro';
 				<!-- Project 2 -->
 				<ProjectCard
 					title="Browser Cookie Tree CLI"
-					href="/work/cookie-cli"
 					year="2023"
 					description="A local-first terminal application for deeply inspecting and visualizing browser cookie structures directly from SQLite databases."
 					tags={["Go", "Rust", "SQLite"]}
@@ -100,7 +95,6 @@ import Link from '../components/atoms/Link.astro';
 				<!-- Project 3 -->
 				<ProjectCard
 					title="Zero-Cost Video Infrastructure"
-					href="/work/loom-clone"
 					year="2023"
 					description="A personal Loom clone architected within AWS Free Tier limits using aggressively optimized temporary TTL patterns to purge ephemeral data."
 					tags={["AWS S3", "DynamoDB", "Serverless"]}
@@ -154,9 +148,12 @@ import Link from '../components/atoms/Link.astro';
 			subtitle="Open to interesting engineering challenges and technical discussions."
 		>
 			<div class="space-y-2 gsap-project-item">
-				<div class="text-sm text-neutral-900 hover:opacity-70 transition-opacity cursor-pointer">
+				<a
+					href="mailto:carlos.daniel.development@gmail.com"
+					class="text-sm text-neutral-900 hover:opacity-70 transition-opacity focus-visible:underline underline-offset-4"
+				>
 					carlos.daniel.development@gmail.com
-				</div>
+				</a>
 				<div class="text-xs text-neutral-500">
 					La Paz, Bolivia · English & Spanish
 				</div>
@@ -165,14 +162,10 @@ import Link from '../components/atoms/Link.astro';
 
 		<footer class="py-12 border-t border-neutral-100 flex justify-between items-center text-xs font-mono text-neutral-400">
 			<div>&copy; {new Date().getFullYear()}</div>
-			<div class="flex gap-6">
-				<Link href="#">GitHub</Link>
-				<Link href="#">LinkedIn</Link>
-			</div>
 		</footer>
 
 		<!-- Custom Cursor -->
-		<div id="custom-cursor" class="fixed top-0 left-0 w-20 h-20 bg-neutral-900 text-white rounded-full flex items-center justify-center text-[10px] uppercase tracking-widest font-medium pointer-events-none z-50 opacity-0 scale-50 -translate-x-1/2 -translate-y-1/2 mix-blend-difference">
+		<div id="custom-cursor" aria-hidden="true" class="fixed top-0 left-0 w-20 h-20 bg-neutral-900 text-white rounded-full flex items-center justify-center text-[10px] uppercase tracking-widest font-medium pointer-events-none z-50 opacity-0 scale-50 -translate-x-1/2 -translate-y-1/2 mix-blend-difference">
 			View
 		</div>
 	</main>
@@ -182,10 +175,18 @@ import Link from '../components/atoms/Link.astro';
 	import gsap from 'gsap';
 	import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-	// Wait for DOM
+	gsap.registerPlugin(ScrollTrigger);
+
+	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 	document.addEventListener('DOMContentLoaded', () => {
-		
-		// 1. Hero Stagger Animation (replacing Framer Motion containerVariants & itemVariants)
+		// Leave everything visible and static for users who ask for less motion.
+		if (prefersReducedMotion) {
+			gsap.set('.gsap-animated-line', { x: '0%' });
+			return;
+		}
+
+		// 1. Hero Stagger Animation
 		gsap.set('.gsap-hero-item', { opacity: 0, y: 20 });
 		gsap.to('.gsap-hero-item', {
 			opacity: 1,
