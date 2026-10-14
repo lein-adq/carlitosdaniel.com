@@ -3,10 +3,12 @@ interface Props {
 	role: string;
 	period: string;
 	company: string;
+	location?: string;
 	description: string;
+	highlights?: string[];
 }
 
-const { role, period, company, description } = Astro.props;
+const { role, period, company, location, description, highlights = [] } = Astro.props;
 ---
 
 <div class="gsap-project-item">
@@ -19,9 +21,18 @@ const { role, period, company, description } = Astro.props;
 		>
 	</div>
 	<div class="text-sm text-neutral-500 font-mono tracking-wide mb-4">
-		{company}
+		{company}{location && ` · ${location}`}
 	</div>
 	<p class="text-sm text-neutral-600 leading-relaxed max-w-2xl">
 		{description}
 	</p>
+	{
+		highlights.length > 0 && (
+			<ul class="mt-4 max-w-2xl list-disc space-y-2 pl-5 text-sm text-neutral-600 leading-relaxed marker:text-neutral-300">
+				{highlights.map((item) => (
+					<li>{item}</li>
+				))}
+			</ul>
+		)
+	}
 </div>

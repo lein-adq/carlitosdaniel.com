@@ -61,14 +61,59 @@ import HeroSection from '../components/organisms/HeroSection.astro';
 			title="Experience"
 			subtitle="Building production systems across different scales."
 		>
-			<div class="space-y-12">
+			<div class="space-y-16">
 				<ExperienceCard
-					role="Senior Software Engineer"
-					period="2021 — Present"
-					company="Tech Company Inc."
-					description="Led the architecture of a high-throughput event-driven microservices platform. Optimized core databases, reducing latency by 40% across major endpoints."
+					role="Software Engineer"
+					period="June 2025 — July 2026"
+					company="NiCE"
+					location="Cochabamba, Bolivia"
+					description="NiCE Knowledge Management is an enterprise platform where support teams publish help content and customers find answers through search and generative AI. I worked across the platform, AI, support and editor teams."
+					highlights={[
+						"Worked on a production RAG platform for generative search on AWS Bedrock (Claude and Amazon Nova), with permission-aware retrieval over Qdrant, per-site vector partitions and SageMaker embeddings.",
+						"Worked on automated answer-quality evaluation: an LLM-as-judge service scoring Faithfulness and Response Relevancy with RAGAS, run asynchronously on a sample of live completions so quality and hallucination checks add no request latency.",
+						"Worked with the guardrails that run before the model: PII detection, prompt-injection normalization, rate limiting, and grounded-only prompts that return no answer when retrieval finds no content.",
+						"Worked with token-streaming generation over SSE, with OpenTelemetry and Datadog instrumentation of retrieval and generation used to triage latency in production.",
+						"Evaluated the ColPali vision-language retrieval approach against lightweight BGE-small embeddings and recommended the faster option on latency grounds.",
+						"Cut search-analytics query latency from an 8,600ms peak average toward a sub-2s target by replacing per-document Painless scripts with filter aggregations, and added timeouts and partial-result guards.",
+						"Eliminated duplicate publish and unpublish operations under a 1,000-concurrent-job load test using idempotent requests, and recovered stranded customer event data by fixing the dead-letter-queue replay pipeline.",
+						"Closed a CSRF vulnerability (CWE-352) found in a penetration test and remediated stored-XSS findings across all customer tenants.",
+					]}
+				/>
+
+				<ExperienceCard
+					role="Software Developer"
+					period="April 2023 — June 2025"
+					company="Symmetry Club LLC"
+					location="Delaware, United States"
+					description="Consumer fitness app on the App Store and Play Store that offers personalized, AI-generated workout plans."
+					highlights={[
+						"Led development of a mobile app from the ground up to 180K+ users and $50K+ in revenue.",
+						"Built a vertical AI agent that generates personalized workout plans, plus internal context-engineering tooling that accelerated development.",
+						"Built scalable REST APIs with Django, PostgreSQL and Cloud SQL, serving millions of requests at high availability.",
+						"Migrated infrastructure from Heroku to Google Cloud (Cloud Run, Cloud SQL, VPC), improving scalability and cost efficiency.",
+						"Built CI/CD pipelines with GitHub Actions and Fastlane, cutting build and deploy times by 60% and enabling zero-downtime releases.",
+						"Designed the frontend as a Clean Architecture modular monorepo so 7+ engineers could ship concurrently, and created a custom A/B-testing framework.",
+					]}
 				/>
 			</div>
+		</Section>
+
+		<!-- Recognition Section -->
+		<Section
+			id="recognition"
+			title="Recognition"
+			subtitle="Hackathons I've won."
+		>
+			<ul class="space-y-4 text-sm text-neutral-900">
+				<li class="gsap-project-item flex items-baseline justify-between gap-4">
+					<span class="font-medium">CochaTech Hackathon</span>
+					<span class="text-xs font-mono tracking-wide text-neutral-400">Winner</span>
+				</li>
+				<li class="gsap-project-item flex items-baseline justify-between gap-4">
+					<span class="font-medium">Paseo Aranjuez Hackathon</span>
+					<span class="text-xs font-mono tracking-wide text-neutral-400">Winner</span>
+				</li>
+			</ul>
 		</Section>
 
 		<!-- Testimonials Section -->
