@@ -3,205 +3,111 @@ import Layout from '../layouts/Layout.astro';
 import Section from '../components/organisms/Section.astro';
 import ProjectCard from '../components/molecules/ProjectCard.astro';
 import ExperienceCard from '../components/molecules/ExperienceCard.astro';
-import TestimonialCard from '../components/molecules/TestimonialCard.astro';
 import HeroSection from '../components/organisms/HeroSection.astro';
+import Button from '../components/atoms/Button.astro';
+
+const email = "carlos.daniel.development@gmail.com";
 ---
 
-<Layout title="Carlos Daniel - Software Engineer">
-	<main id="main" class="max-w-4xl mx-auto px-6">
+<Layout title="Carlos Daniel - Backend and AI Engineer">
+	<main id="main">
+		<div class="max-w-5xl mx-auto px-6">
+			<HeroSection />
 
-		<HeroSection />
-
-		<!-- Projects Section -->
-		<Section 
-			id="projects" 
-			title="Selected Projects" 
-			subtitle="Production systems exploring complex constraints and efficient architectures."
-		>
-			<div class="space-y-24">
-				<!-- Project 1 -->
+			<Section
+				id="projects"
+				title="Selected work"
+				subtitle="Three projects, each built around a constraint that had to hold."
+			>
 				<ProjectCard
-					title="End-to-End RAG & AI Agent Service"
-					href="/work/rag-agent"
-					year="2024"
-					description="A high-throughput retrieval-augmented generation pipeline ensuring sub-200ms latency for complex queries, using concurrent vectors searches and streaming SSE responses."
-					tags={["Python", "FastAPI", "Vector DB"]}
-				>
-					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-					<Fragment slot="placeholder-text">Architecture Diagram Placeholder</Fragment>
-				</ProjectCard>
-
-				<!-- FormCore -->
-				<ProjectCard
-					title="FormCore: Multi-Tenant Form Backend"
+					title="FormCore, a multi-tenant form backend"
 					href="/work/formcore"
 					repo="https://github.com/lein-adq/form_submission_service"
 					year="2025"
-					description="A form backend-as-a-service with workspace tenancy and JWT auth, where Postgres row-level security, not application code, is the authority on data isolation."
-					tags={["Python", "FastAPI", "PostgreSQL RLS"]}
-				>
-					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-					<Fragment slot="placeholder-text">Tenancy &amp; RLS Diagram Placeholder</Fragment>
-				</ProjectCard>
+					description="Workspace tenancy and JWT auth, where Postgres row-level security, not application code, decides who can see which rows."
+					why="data isolation holds even if the application has a bug."
+					stack={["Python", "FastAPI", "PostgreSQL"]}
+				/>
 
-				<!-- Centinela -->
 				<ProjectCard
-					title="Centinela: Enterprise RAG Microservice"
+					title="Centinela, an enterprise RAG microservice"
 					href="/work/centinela"
 					repo="https://github.com/lein-adq/knowledge-service"
 					year="2026"
-					description="Vector search over business policies and audit logs, built with hexagonal architecture around LangChain, HuggingFace embeddings and pgvector. Companion to a standalone document RAG pipeline."
-					tags={["Python", "LangChain", "pgvector"]}
-				>
-					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-					<Fragment slot="placeholder-text">Hexagonal Architecture Placeholder</Fragment>
-				</ProjectCard>
+					description="Vector search over business policies and audit logs, with LangChain, HuggingFace embeddings and pgvector kept behind hexagonal ports."
+					why="the embedding model and vector store can be swapped without touching business logic."
+					stack={["Python", "FastAPI", "LangChain", "pgvector"]}
+				/>
 
-				<!-- Poker -->
 				<ProjectCard
 					title="Multiplayer Texas Hold'em"
 					href="/work/poker"
 					repo="https://github.com/lein-adq/poker"
 					year="2026"
-					description="Real-time poker with a .NET and SignalR backend, Redis, and the Ory stack (Kratos and Oathkeeper) for identity and an auth-proxy edge, all brought up with one docker compose command."
-					tags={[".NET", "SignalR", "React", "Ory"]}
-				>
-					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-					<Fragment slot="placeholder-text">Gameplay Screenshot Placeholder</Fragment>
-				</ProjectCard>
+					description="A real-time game on .NET and SignalR with Redis and the Ory identity stack, backed by 611 backend tests and an end-to-end suite."
+					why="each player only ever receives the cards they are allowed to see, and chips are never created or lost."
+					stack={[".NET", "SignalR", "React", "Redis", "Ory Kratos"]}
+				/>
+			</Section>
 
-				<!-- Project 2 -->
-				<ProjectCard
-					title="Browser Cookie Tree CLI"
-					year="2023"
-					description="A local-first terminal application for deeply inspecting and visualizing browser cookie structures directly from SQLite databases."
-					tags={["Go", "Rust", "SQLite"]}
-				>
-					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-					<Fragment slot="placeholder-text">Terminal CLI GIF Placeholder</Fragment>
-				</ProjectCard>
-
-				<!-- Project 3 -->
-				<ProjectCard
-					title="Zero-Cost Video Infrastructure"
-					year="2023"
-					description="A personal Loom clone architected within AWS Free Tier limits using aggressively optimized temporary TTL patterns to purge ephemeral data."
-					tags={["AWS S3", "DynamoDB", "Serverless"]}
-				>
-					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-					<Fragment slot="placeholder-text">Video Dashboard / AWS Flow Placeholder</Fragment>
-				</ProjectCard>
-			</div>
-		</Section>
-
-		<!-- Experience Section -->
-		<Section
-			id="experience"
-			title="Experience"
-			subtitle="Building production systems across different scales."
-		>
-			<div class="space-y-16">
+			<Section id="experience" title="Experience">
 				<ExperienceCard
 					role="Software Engineer"
-					period="June 2025 — July 2026"
+					period="June 2025 to July 2026"
 					company="NiCE"
 					location="Cochabamba, Bolivia"
 					description="NiCE Knowledge Management is an enterprise platform where support teams publish help content and customers find answers through search and generative AI. I worked across the platform, AI, support and editor teams."
 					highlights={[
 						"Worked on a production RAG platform for generative search on AWS Bedrock (Claude and Amazon Nova), with permission-aware retrieval over Qdrant, per-site vector partitions and SageMaker embeddings.",
+						"Cut search-analytics query latency from an 8,600ms peak average toward a sub-2s target by replacing per-document Painless scripts with filter aggregations, and added timeouts and partial-result guards.",
+						"Closed a CSRF vulnerability (CWE-352) found in a penetration test and remediated stored-XSS findings across all customer tenants.",
 						"Worked on automated answer-quality evaluation: an LLM-as-judge service scoring Faithfulness and Response Relevancy with RAGAS, run asynchronously on a sample of live completions so quality and hallucination checks add no request latency.",
 						"Worked with the guardrails that run before the model: PII detection, prompt-injection normalization, rate limiting, and grounded-only prompts that return no answer when retrieval finds no content.",
 						"Worked with token-streaming generation over SSE, with OpenTelemetry and Datadog instrumentation of retrieval and generation used to triage latency in production.",
 						"Evaluated the ColPali vision-language retrieval approach against lightweight BGE-small embeddings and recommended the faster option on latency grounds.",
-						"Cut search-analytics query latency from an 8,600ms peak average toward a sub-2s target by replacing per-document Painless scripts with filter aggregations, and added timeouts and partial-result guards.",
 						"Eliminated duplicate publish and unpublish operations under a 1,000-concurrent-job load test using idempotent requests, and recovered stranded customer event data by fixing the dead-letter-queue replay pipeline.",
-						"Closed a CSRF vulnerability (CWE-352) found in a penetration test and remediated stored-XSS findings across all customer tenants.",
 					]}
 				/>
 
 				<ExperienceCard
 					role="Software Developer"
-					period="April 2023 — June 2025"
-					company="Symmetry Club LLC"
+					period="April 2023 to June 2025"
+					company="Symmetry Club"
 					location="Delaware, United States"
 					description="Consumer fitness app on the App Store and Play Store that offers personalized, AI-generated workout plans."
 					highlights={[
 						"Led development of a mobile app from the ground up to 180K+ users and $50K+ in revenue.",
 						"Built a vertical AI agent that generates personalized workout plans, plus internal context-engineering tooling that accelerated development.",
-						"Built scalable REST APIs with Django, PostgreSQL and Cloud SQL, serving millions of requests at high availability.",
 						"Migrated infrastructure from Heroku to Google Cloud (Cloud Run, Cloud SQL, VPC), improving scalability and cost efficiency.",
+						"Built scalable REST APIs with Django, PostgreSQL and Cloud SQL, serving millions of requests at high availability.",
 						"Built CI/CD pipelines with GitHub Actions and Fastlane, cutting build and deploy times by 60% and enabling zero-downtime releases.",
 						"Designed the frontend as a Clean Architecture modular monorepo so 7+ engineers could ship concurrently, and created a custom A/B-testing framework.",
 					]}
 				/>
-			</div>
-		</Section>
+			</Section>
+		</div>
 
-		<!-- Recognition Section -->
-		<Section
-			id="recognition"
-			title="Recognition"
-			subtitle="Hackathons I've won."
-		>
-			<ul class="space-y-4 text-sm text-neutral-900">
-				<li class="gsap-project-item flex items-baseline justify-between gap-4">
-					<span class="font-medium">CochaTech Hackathon</span>
-					<span class="text-xs font-mono tracking-wide text-neutral-400">Winner</span>
-				</li>
-				<li class="gsap-project-item flex items-baseline justify-between gap-4">
-					<span class="font-medium">Paseo Aranjuez Hackathon</span>
-					<span class="text-xs font-mono tracking-wide text-neutral-400">Winner</span>
-				</li>
-			</ul>
-		</Section>
-
-		<!-- Testimonials Section -->
-		<Section
-			id="testimonials"
-			title="What People Say"
-			subtitle="Feedback from colleagues and engineering leaders."
-		>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-				<TestimonialCard
-					quote="Carlos is a rare engineer who not only understands deep backend complexity but also cares about the business outcomes. He completely transformed our data pipeline, reducing costs by 30% while improving latency."
-					name="Jane Doe"
-					role="VP of Engineering"
-				/>
-				<TestimonialCard
-					quote="Working with him on the microservices migration was incredibly smooth. He brings a level of rigor to architecture discussions that elevates the whole team."
-					name="John Smith"
-					role="Staff Engineer"
-				/>
-			</div>
-		</Section>
-
-		<!-- Contact Section -->
-		<Section
-			id="contact"
-			title="Get in Touch"
-			subtitle="Open to interesting engineering challenges and technical discussions."
-		>
-			<div class="space-y-2 gsap-project-item">
-				<a
-					href="mailto:carlos.daniel.development@gmail.com"
-					class="text-sm text-neutral-900 hover:opacity-70 transition-opacity focus-visible:underline underline-offset-4"
-				>
-					carlos.daniel.development@gmail.com
-				</a>
-				<div class="text-xs text-neutral-500">
-					La Paz, Bolivia · English & Spanish
+		<!-- Contact band: the page's closing call to action -->
+		<section id="contact" class="mt-24 bg-ink text-white scroll-mt-0">
+			<div class="max-w-5xl mx-auto px-6 py-20 sm:py-24 flex flex-col md:flex-row md:items-center md:justify-between gap-10 md:gap-16">
+				<div class="max-w-xl">
+					<h2 class="font-serif text-4xl sm:text-5xl font-normal tracking-tight leading-[1.1] text-white mb-4">
+						Hiring for an AI or backend role?
+					</h2>
+					<p class="text-lg text-[#c9cdd4] leading-relaxed">
+						I reply to every message. Tell me about the team and the problem, and I will tell you where I can help.
+					</p>
+				</div>
+				<div class="flex flex-col items-start gap-4 shrink-0">
+					<Button href={`mailto:${email}`} variant="inverse" size="lg">Email me</Button>
+					<a href={`mailto:${email}`} class="text-sm text-[#c9cdd4] hover:text-white transition-colors underline underline-offset-4 decoration-white/30">{email}</a>
 				</div>
 			</div>
-		</Section>
+		</section>
 
-		<footer class="py-12 border-t border-neutral-100 flex justify-between items-center text-xs font-mono text-neutral-400">
-			<div>&copy; {new Date().getFullYear()}</div>
+		<footer class="max-w-5xl mx-auto px-6 py-8 text-[13px] text-muted">
+			&copy; {new Date().getFullYear()} Carlos Daniel
 		</footer>
-
-		<!-- Custom Cursor -->
-		<div id="custom-cursor" aria-hidden="true" class="fixed top-0 left-0 w-20 h-20 bg-neutral-900 text-white rounded-full flex items-center justify-center text-[10px] uppercase tracking-widest font-medium pointer-events-none z-50 opacity-0 scale-50 -translate-x-1/2 -translate-y-1/2 mix-blend-difference">
-			View
-		</div>
 	</main>
 </Layout>
 
@@ -215,12 +121,9 @@ import HeroSection from '../components/organisms/HeroSection.astro';
 
 	document.addEventListener('DOMContentLoaded', () => {
 		// Leave everything visible and static for users who ask for less motion.
-		if (prefersReducedMotion) {
-			gsap.set('.gsap-animated-line', { x: '0%' });
-			return;
-		}
+		if (prefersReducedMotion) return;
 
-		// 1. Hero Stagger Animation
+		// Hero stagger
 		gsap.set('.gsap-hero-item', { opacity: 0, y: 20 });
 		gsap.to('.gsap-hero-item', {
 			opacity: 1,
@@ -228,70 +131,22 @@ import HeroSection from '../components/organisms/HeroSection.astro';
 			duration: 0.8,
 			ease: 'power2.out',
 			stagger: 0.15,
-			delay: 0.2
+			delay: 0.2,
 		});
 
-		// 2. Animated Line intersection triggers
-		const animatedLines = document.querySelectorAll('.gsap-animated-line');
-		animatedLines.forEach((line) => {
-			ScrollTrigger.create({
-				trigger: line.parentElement, // Trigger on the container
-				start: 'top 85%', // When the top of the container hits 85% of the viewport height
-				onEnter: () => {
-					gsap.to(line, {
-						x: '0%', 
-						duration: 1.2, 
-						ease: 'power3.out'
-					});
-				},
-				once: true // Only animate once
-			});
-		});
-
-		// 3. Project Items Reveal
-		const projectItems = document.querySelectorAll('.gsap-project-item');
-		projectItems.forEach((item) => {
-			gsap.fromTo(item, 
+		// Project and experience rows reveal once as they scroll into view
+		document.querySelectorAll('.gsap-project-item').forEach((item) => {
+			gsap.fromTo(
+				item,
 				{ opacity: 0, y: 15 },
 				{
 					opacity: 1,
 					y: 0,
 					duration: 0.6,
 					ease: 'power2.out',
-					scrollTrigger: {
-						trigger: item,
-						start: 'top 90%',
-						once: true
-					}
-				}
+					scrollTrigger: { trigger: item, start: 'top 90%', once: true },
+				},
 			);
 		});
-
-		// 4. Custom Cursor Logic
-		const cursor = document.getElementById('custom-cursor');
-		const hoverElements = document.querySelectorAll('.project-image-hover');
-
-		if (cursor && window.matchMedia("(pointer: fine)").matches) {
-			// Track mouse position globally
-			document.addEventListener('mousemove', (e) => {
-				gsap.to(cursor, {
-					x: e.clientX,
-					y: e.clientY,
-					duration: 0.15,
-					ease: 'power2.out'
-				});
-			});
-
-			// Expand cursor on specific hover elements
-			hoverElements.forEach(el => {
-				el.addEventListener('mouseenter', () => {
-					gsap.to(cursor, { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(1.5)' });
-				});
-				el.addEventListener('mouseleave', () => {
-					gsap.to(cursor, { opacity: 0, scale: 0.5, duration: 0.3, ease: 'power2.in' });
-				});
-			});
-		}
-
 	});
 </script>

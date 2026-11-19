@@ -1,8 +1,9 @@
 ---
 import Layout from "./Layout.astro";
-import Chip from "../components/atoms/Chip.astro";
+import Button from "../components/atoms/Button.astro";
 
 const { frontmatter } = Astro.props;
+const email = "carlos.daniel.development@gmail.com";
 ---
 
 <Layout
@@ -10,60 +11,63 @@ const { frontmatter } = Astro.props;
 	description={frontmatter.description}
 >
 	<noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
-	<main id="main" class="max-w-prose mx-auto px-6 lg:px-0 py-32">
-		<!-- Back link -->
-		<div class="mb-16 reveal">
-			<a
-				href="/"
-				class="text-sm font-mono tracking-wide uppercase text-slate-500 hover:text-slate-900 transition-colors inline-flex items-center gap-2 group"
-			>
-				<span class="transform group-hover:-translate-x-1 transition-transform"
-					>←</span
-				> Back to Index
-			</a>
+	<main id="main">
+		<div class="max-w-3xl mx-auto px-6 pt-28 pb-24">
+			<!-- Back link -->
+			<div class="mb-14 reveal">
+				<a
+					href="/"
+					class="text-sm text-ink-soft hover:text-ink transition-colors inline-flex items-center gap-2 group underline-offset-4 focus:outline-none focus-visible:underline"
+				>
+					<span class="transform group-hover:-translate-x-1 transition-transform"
+						>←</span
+					> Carlos Daniel
+				</a>
+			</div>
+
+			<!-- Title and meta -->
+			<header class="mb-16 reveal">
+				<p class="text-sm text-muted mb-5">Case study · {frontmatter.timeline}</p>
+				<h1 class="font-serif text-5xl sm:text-6xl font-normal tracking-tight leading-[1.05] mb-6 text-ink text-balance">
+					{frontmatter.title}
+				</h1>
+				<p class="text-lg sm:text-xl leading-relaxed text-ink-soft mb-10">
+					{frontmatter.description}
+				</p>
+
+				<dl class="flex flex-wrap gap-x-12 gap-y-6 border-y border-rule py-7">
+					<div>
+						<dt class="text-[13px] text-muted mb-1.5">Role</dt>
+						<dd class="text-base font-medium text-ink">{frontmatter.role}</dd>
+					</div>
+					<div>
+						<dt class="text-[13px] text-muted mb-1.5">Timeline</dt>
+						<dd class="text-base font-medium text-ink">{frontmatter.timeline}</dd>
+					</div>
+					<div class="min-w-0 flex-1 basis-64">
+						<dt class="text-[13px] text-muted mb-1.5">Stack</dt>
+						<dd class="text-base font-medium text-ink">{frontmatter.stack.join(", ")}</dd>
+					</div>
+				</dl>
+			</header>
+
+			<!-- The Article -->
+			<article class="text-lg leading-[1.75] text-ink-soft reveal mdx-content">
+				<slot />
+			</article>
 		</div>
 
-		<!-- Meta Block -->
-		<header class="mb-24 reveal">
-			<h1 class="text-5xl font-medium tracking-tight mb-8 text-slate-900">
-				{frontmatter.title}
-			</h1>
-
-			<div
-				class="grid grid-cols-2 sm:grid-cols-4 gap-8 border-t border-b border-slate-200 py-8"
-			>
-				<div>
-					<span
-						class="block text-sm font-mono tracking-wide uppercase text-slate-400 mb-1"
-						>Role</span
-					>
-					<span class="text-slate-900 font-medium">{frontmatter.role}</span>
-				</div>
-				<div>
-					<span
-						class="block text-sm font-mono tracking-wide uppercase text-slate-400 mb-1"
-						>Timeline</span
-					>
-					<span class="text-slate-900 font-medium">{frontmatter.timeline}</span>
-				</div>
-				<div class="col-span-2 sm:col-span-2">
-					<span
-						class="block text-sm font-mono tracking-wide uppercase text-slate-400 mb-1"
-						>Stack</span
-					>
-					<div class="flex flex-wrap gap-2">
-						{frontmatter.stack.map((tech: string) => (
-							<Chip>{tech}</Chip>
-						))}
-					</div>
+		<!-- Closing call to action -->
+		<section class="bg-ink text-white">
+			<div class="max-w-3xl mx-auto px-6 py-16 sm:py-20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8">
+				<h2 class="font-serif text-3xl sm:text-4xl font-normal tracking-tight leading-[1.15] text-white max-w-md">
+					Want this kind of engineering on your team?
+				</h2>
+				<div class="shrink-0">
+					<Button href={`mailto:${email}`} variant="inverse" size="lg">Email me</Button>
 				</div>
 			</div>
-		</header>
-
-		<!-- The Article -->
-		<article class="text-lg leading-relaxed text-slate-600 reveal mdx-content">
-			<slot />
-		</article>
+		</section>
 	</main>
 </Layout>
 
@@ -93,22 +97,25 @@ const { frontmatter } = Astro.props;
 
 	/* MDX Content Styles */
 	.mdx-content h2 {
-		@apply text-3xl font-medium tracking-tight mb-6 text-slate-900 mt-16;
+		@apply font-serif text-3xl font-medium tracking-tight mb-5 text-ink mt-14;
 	}
 	.mdx-content p {
 		@apply mb-6;
 	}
+	.mdx-content a {
+		@apply text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors;
+	}
 	.mdx-content ul {
-		@apply space-y-4 list-disc pl-5 my-8;
+		@apply space-y-3 list-disc pl-5 my-8 marker:text-muted;
 	}
 	.mdx-content li strong {
-		@apply text-slate-900;
+		@apply text-ink font-semibold;
 	}
 	.mdx-content pre {
 		@apply bg-[#0a0a0a] text-slate-200 p-6 rounded-lg overflow-x-auto font-mono text-sm shadow-xl my-8;
 	}
 	.mdx-content code {
-		@apply bg-slate-100 px-1.5 py-0.5 rounded text-sm font-mono text-slate-800;
+		@apply bg-ink/5 px-1.5 py-0.5 rounded text-sm font-mono text-ink;
 	}
 	.mdx-content pre code {
 		@apply bg-transparent p-0 text-inherit;

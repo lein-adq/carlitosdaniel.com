@@ -1,6 +1,6 @@
 ---
-import "@fontsource-variable/ibm-plex-sans";
-import "@fontsource-variable/jetbrains-mono";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/newsreader";
 import "../styles/global.css";
 import Header from "../components/organisms/Header.astro";
 
@@ -11,7 +11,7 @@ interface Props {
 
 const {
 	title,
-	description = "Carlos Daniel is a backend and infrastructure engineer building highly available, real-time systems with Python, Go, and AWS.",
+	description = "Carlos Daniel is a backend and AI engineer building production RAG systems and real-time backends. Open to full-time roles.",
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -21,7 +21,7 @@ const jsonLd = {
 	"@type": "Person",
 	name: "Carlos Daniel",
 	url: Astro.site?.toString(),
-	jobTitle: "Backend & Infrastructure Engineer",
+	jobTitle: "Backend & AI Engineer",
 	address: { "@type": "PostalAddress", addressLocality: "La Paz", addressCountry: "BO" },
 	knowsLanguage: ["en", "es"],
 };
@@ -35,7 +35,7 @@ const jsonLd = {
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="canonical" href={canonical} />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="theme-color" content="#ffffff" />
+		<meta name="theme-color" content="#fbfbf9" />
 		<title>{title}</title>
 		<meta name="description" content={description} />
 
@@ -51,11 +51,11 @@ const jsonLd = {
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	</head>
 	<body
-		class="bg-white text-neutral-900 selection:bg-neutral-200 selection:text-neutral-900 font-sans"
+		class="bg-paper text-ink selection:bg-rule selection:text-ink font-sans"
 	>
 		<a
 			href="#main"
-			class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:bg-neutral-900 focus:px-4 focus:py-2 focus:text-sm focus:text-white"
+			class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-white"
 		>
 			Skip to content
 		</a>

@@ -1,46 +1,44 @@
 ---
 import Logo from '../atoms/Logo.astro';
 import NavLink from '../atoms/NavLink.astro';
+import Button from '../atoms/Button.astro';
 ---
 <header
 	id="main-header"
-	class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/0 backdrop-blur-none border-b border-transparent"
+	class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-paper/0 backdrop-blur-none border-b border-transparent"
 >
 	<div
-		class="mx-auto max-w-4xl px-6 py-5 sm:py-6 flex items-center justify-between gap-4"
+		class="mx-auto max-w-5xl px-6 py-4 sm:py-5 flex items-center justify-between gap-4"
 	>
 		<Logo href="/">
 			<span class="sr-only sm:not-sr-only">Carlos Daniel</span>
 			<span aria-hidden="true" class="sm:hidden">CD</span>
 		</Logo>
 		<nav aria-label="Primary" class="flex items-center gap-5 sm:gap-8 whitespace-nowrap">
-			<NavLink href="/#projects">Projects</NavLink>
+			<NavLink href="/#projects">Work</NavLink>
 			<NavLink href="/#experience">Experience</NavLink>
-			<NavLink href="/#contact">Contact</NavLink>
+			<Button href="mailto:carlos.daniel.development@gmail.com">Email me</Button>
 		</nav>
 	</div>
-	<!-- Animated bottom border via JS opacity -->
+	<!-- Hairline shown once the page has scrolled -->
 	<div
 		id="header-border"
-		class="absolute bottom-0 left-0 right-0 h-px bg-neutral-200 opacity-0 transition-opacity duration-300"
+		class="absolute bottom-0 left-0 right-0 h-px bg-rule opacity-0 transition-opacity duration-300"
 	>
 	</div>
 </header>
 
 <script>
-	// Header Scroll Effect
+	// Header scroll effect: frosted paper background and a hairline after 50px.
 	const header = document.getElementById("main-header");
 	const headerBorder = document.getElementById("header-border");
 
 	window.addEventListener("scroll", () => {
-		if (window.scrollY > 50) {
-			header?.classList.replace("bg-white/0", "bg-white/80");
-			header?.classList.replace("backdrop-blur-none", "backdrop-blur-md");
-			if (headerBorder) headerBorder.style.opacity = "0.6";
-		} else {
-			header?.classList.replace("bg-white/80", "bg-white/0");
-			header?.classList.replace("backdrop-blur-md", "backdrop-blur-none");
-			if (headerBorder) headerBorder.style.opacity = "0";
-		}
+		const scrolled = window.scrollY > 50;
+		header?.classList.toggle("bg-paper/90", scrolled);
+		header?.classList.toggle("bg-paper/0", !scrolled);
+		header?.classList.toggle("backdrop-blur-md", scrolled);
+		header?.classList.toggle("backdrop-blur-none", !scrolled);
+		if (headerBorder) headerBorder.style.opacity = scrolled ? "1" : "0";
 	});
 </script>

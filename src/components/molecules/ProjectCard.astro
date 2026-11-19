@@ -1,80 +1,44 @@
 ---
 interface Props {
 	title: string;
-	/** Omit while the case study doesn't exist yet; the card renders unlinked. */
+	/** Omit while the case study doesn't exist yet; the card then shows only the source link. */
 	href?: string;
-	/** Public source repository, rendered as a link under the tags. */
+	/** Public source repository. */
 	repo?: string;
 	year: string;
 	description: string;
-	tags: string[];
+	/** One skimmable sentence on what the project proves. */
+	why: string;
+	stack: string[];
 }
 
-const { title, href, repo, year, description, tags } = Astro.props;
-
-const VisualTag = href ? "a" : "div";
-const TitleTag = href ? "a" : "span";
+const { title, href, repo, year, description, why, stack } = Astro.props;
 ---
 
-<div class="gsap-project-item group">
-	<!-- Project Visual Placeholder -->
-	<VisualTag
-		href={href}
-		aria-label={href ? `View case study: ${title}` : undefined}
-		class:list={[
-			"block mb-8 overflow-hidden rounded-xl bg-neutral-100 border border-neutral-200 aspect-video relative flex items-center justify-center text-neutral-400 transition-colors",
-			href && "project-image-hover group-hover:border-neutral-300 cursor-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2",
-		]}
-	>
-		<div
-			class="absolute inset-0 bg-neutral-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-		>
-		</div>
-		<div
-			class="flex flex-col items-center z-0 transition-transform duration-500 group-hover:scale-105"
-		>
-			<slot name="icon" />
-			<span class="text-xs font-mono"><slot name="placeholder-text" /></span>
-		</div>
-	</VisualTag>
+<article class="gsap-project-item flex flex-col md:flex-row gap-x-12 gap-y-4 py-10 border-t border-rule last:border-b">
+	<div class="md:w-24 shrink-0 text-sm text-muted md:pt-2">{year}</div>
 
-	<div
-		class="flex flex-col md:flex-row md:justify-between md:items-baseline mb-3 px-1"
-	>
-		<h3 class="text-xl font-medium text-neutral-900">
-			<TitleTag
-				href={href}
-				class:list={[
-					href && "hover:underline decoration-neutral-300 underline-offset-4 focus:outline-none focus-visible:underline",
-				]}
-			>
-				{title}
-			</TitleTag>
-			{!href && <span class="ml-3 text-xs font-mono text-neutral-400">Case study coming soon</span>}
+	<div class="min-w-0 flex-1">
+		<h3 class="font-serif text-[1.75rem] sm:text-[2rem] leading-tight font-medium tracking-tight text-ink mb-3">
+			{href ? (
+				<a href={href} class="hover:text-link transition-colors focus:outline-none focus-visible:underline underline-offset-4">{title}</a>
+			) : (
+				title
+			)}
 		</h3>
-		<span class="text-xs font-mono tracking-wide text-neutral-400 mt-1 md:mt-0"
-			>{year}</span
-		>
+		<p class="text-base text-ink-soft leading-relaxed max-w-xl mb-3.5">{description}</p>
+		<p class="text-base text-ink leading-relaxed max-w-xl mb-5">
+			<strong class="font-semibold">Why it matters:</strong> {why}
+		</p>
+		<p class="text-sm text-muted">{stack.join(" · ")}</p>
 	</div>
-	<p class="text-sm text-neutral-600 leading-relaxed max-w-2xl mb-4 px-1">
-		{description}
-	</p>
-	<div class="flex gap-2 text-xs font-mono text-neutral-500 px-1">
-		{tags.map((tag, index) => {
-			if (tags.length === 1) return <span>[ {tag} ]</span>;
-			if (index === 0) return <span>[ {tag}</span>;
-			if (index === tags.length - 1) return <span>{tag} ]</span>;
-			return <span>{tag}</span>;
-		})}
+
+	<div class="flex md:flex-col gap-x-6 gap-y-2.5 text-sm font-medium md:pt-2 md:items-end">
+		{href && (
+			<a href={href} class="text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors whitespace-nowrap">Read the case study →</a>
+		)}
+		{repo && (
+			<a href={repo} target="_blank" rel="noopener noreferrer" class="text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors whitespace-nowrap">Source on GitHub ↗</a>
+		)}
 	</div>
-	{repo && (
-		<a
-			href={repo}
-			target="_blank"
-			rel="noopener noreferrer"
-			class="inline-block mt-4 px-1 text-xs font-mono text-neutral-500 hover:text-neutral-900 underline decoration-neutral-300 underline-offset-4 focus:outline-none focus-visible:text-neutral-900"
-		>
-			View source on GitHub ↗
-		</a>
-	)}
-</div>
+</article>

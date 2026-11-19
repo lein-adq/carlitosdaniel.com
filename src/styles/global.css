@@ -1,14 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "IBM Plex Sans Variable",ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: "Newsreader Variable", Georgia, "Times New Roman", serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Calm, high-contrast palette. Every text color passes 4.5:1 on --color-paper. */
+  --color-paper: #fbfbf9;
+  --color-ink: #0e1116;
+  --color-ink-soft: #3a4250;
+  --color-muted: #5a6270;
+  --color-rule: #d9d8d2;
+  --color-link: #1b3a5c;
+  --color-available: #1f7a4d;
 }
 
 @layer base {
   html {
     font-family: var(--font-sans);
-    @apply text-slate-900 bg-slate-50 antialiased selection:bg-slate-300;
+    @apply text-ink bg-paper antialiased selection:bg-rule;
   }
 
   /* Dark mode is disabled or can be added later */

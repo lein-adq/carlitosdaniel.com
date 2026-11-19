@@ -1,17 +1,28 @@
 ---
 interface Props {
 	href: string;
-	variant?: "primary" | "secondary";
+	/** `primary` is the single high-contrast call to action; `inverse` is its twin on dark backgrounds. */
+	variant?: "primary" | "inverse";
+	size?: "md" | "lg";
 	target?: string;
 }
 
-const { href, variant = "primary", target } = Astro.props;
+const { href, variant = "primary", size = "md", target } = Astro.props;
 
-const baseClasses = "inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium transition-all rounded-full hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2";
-const primaryClasses = "text-white bg-neutral-900 hover:bg-neutral-800 focus:ring-neutral-900";
-const secondaryClasses = "text-neutral-900 bg-white border border-neutral-200 hover:bg-neutral-50 focus:ring-neutral-200";
+const base =
+	"inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
+const sizes = {
+	md: "px-5 py-2.5 text-sm",
+	lg: "px-7 py-4 text-base",
+};
+const variants = {
+	primary:
+		"bg-ink text-white hover:bg-link focus-visible:ring-ink focus-visible:ring-offset-paper",
+	inverse:
+		"bg-white text-ink hover:bg-rule focus-visible:ring-white focus-visible:ring-offset-ink",
+};
 
-const classes = `${baseClasses} ${variant === "primary" ? primaryClasses : secondaryClasses}`;
+const classes = `${base} ${sizes[size]} ${variants[variant]}`;
 ---
 
 <a href={href} target={target} class={classes}>

@@ -1,54 +1,45 @@
 ---
-import Chip from '../atoms/Chip.astro';
 import Button from '../atoms/Button.astro';
+
+const proof = [
+  { label: 'Most recently', title: 'NiCE, Knowledge Management', detail: 'Production RAG on AWS Bedrock' },
+  { label: 'Before that', title: 'Symmetry Club', detail: 'Led a mobile app to 180K+ users' },
+  { label: 'Recognition', title: 'Two hackathon wins', detail: 'CochaTech and Paseo Aranjuez' },
+];
 ---
 
-<section id="hero" class="min-h-svh flex flex-col justify-center pt-28 pb-16 sm:pt-32">
-  <div class="gsap-hero-container grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-8 lg:gap-12 items-center">
-    <div class="order-2 lg:order-1 min-w-0">
-      <div class="gsap-hero-item mb-4 sm:mb-6 text-xs font-mono text-neutral-500 tracking-wide">
-        Backend &amp; Infrastructure Engineer
-      </div>
+<section id="hero" class="pt-36 sm:pt-44 pb-16">
+  <div class="max-w-3xl">
+    <p class="gsap-hero-item flex items-center gap-2.5 text-sm text-ink-soft mb-8">
+      <span aria-hidden="true" class="size-2 rounded-full bg-available"></span>
+      Open to full-time roles · La Paz, Bolivia · English &amp; Spanish
+    </p>
 
-      <h1 class="gsap-hero-item text-4xl sm:text-5xl lg:text-[2.75rem] xl:text-5xl font-light text-neutral-900 leading-[1.15] mb-8 tracking-tight text-balance">
-        Building infrastructure
-        that scales.
-        <span class="text-neutral-400">So your team can focus
-        on shipping product.</span>
-      </h1>
+    <h1 class="gsap-hero-item font-serif text-5xl sm:text-6xl lg:text-[4.25rem] font-normal text-ink leading-[1.05] tracking-tight mb-7 text-balance">
+      Backend and AI engineer building production RAG and real-time systems.
+    </h1>
 
-      <div class="gsap-hero-item max-w-xl text-neutral-600 leading-relaxed mb-8 space-y-4">
-        <p class="text-sm">
-          You need systems that won't buckle under pressure. I design and build highly available, real-time architectures using Python, Go, and AWS—ensuring your platform remains fast, reliable, and cost-effective.
-        </p>
-        <p class="text-sm">
-          From integrating complex AI/RAG pipelines to removing performance bottlenecks, I help engineering teams turn architectural challenges into robust solutions.
-        </p>
-      </div>
+    <p class="gsap-hero-item text-lg sm:text-xl text-ink-soft leading-relaxed max-w-2xl mb-10">
+      I have shipped generative search at enterprise scale and a consumer app used by 180K+ people. I care about systems that stay correct when the code around them is wrong.
+    </p>
 
-      <div class="gsap-hero-item mb-12 flex items-center gap-4">
-        <Button href="#contact" variant="primary">
-          Let's chat
-        </Button>
-      </div>
-
-      <div class="gsap-hero-item flex flex-wrap gap-3 text-xs font-mono">
-        <Chip>TypeScript</Chip>
-        <Chip>Python</Chip>
-        <Chip>Go</Chip>
-        <Chip>SQLite</Chip>
-        <Chip>AWS</Chip>
-        <Chip>AI/RAG</Chip>
-      </div>
-    </div>
-
-    <div class="order-1 lg:order-2 gsap-hero-item flex justify-start lg:justify-end">
-      <!-- Visual Placeholder -->
-      <div class="w-28 h-28 sm:w-40 sm:h-40 lg:w-56 lg:h-56 shrink-0 rounded-2xl bg-neutral-100 border border-neutral-200 overflow-hidden flex flex-col items-center justify-center text-neutral-400 relative group">
-        <div class="absolute inset-0 bg-linear-to-tr from-neutral-200/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        <svg class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-        <span class="text-xs font-mono text-center px-4">Profile Photo /<br />Abstract Visual</span>
-      </div>
+    <div class="gsap-hero-item flex flex-wrap items-center gap-x-7 gap-y-4">
+      <Button href="mailto:carlos.daniel.development@gmail.com" size="lg">Email me</Button>
+      <a href="#projects" class="text-base font-medium text-ink underline underline-offset-[5px] decoration-rule hover:decoration-ink transition-colors">
+        See selected work ↓
+      </a>
     </div>
   </div>
+
+  <dl class="gsap-hero-item mt-20 grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12 py-9 border-y border-rule">
+    {proof.map((p) => (
+      <div>
+        <dt class="text-[13px] text-muted mb-2">{p.label}</dt>
+        <dd>
+          <span class="block font-serif text-[22px] leading-snug text-ink">{p.title}</span>
+          <span class="block text-sm text-ink-soft mt-1.5">{p.detail}</span>
+        </dd>
+      </div>
+    ))}
+  </dl>
 </section>
