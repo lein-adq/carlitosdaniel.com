@@ -31,6 +31,45 @@ import HeroSection from '../components/organisms/HeroSection.astro';
 					<Fragment slot="placeholder-text">Architecture Diagram Placeholder</Fragment>
 				</ProjectCard>
 
+				<!-- FormCore -->
+				<ProjectCard
+					title="FormCore: Multi-Tenant Form Backend"
+					href="/work/formcore"
+					repo="https://github.com/lein-adq/form_submission_service"
+					year="2025"
+					description="A form backend-as-a-service with workspace tenancy and JWT auth, where Postgres row-level security, not application code, is the authority on data isolation."
+					tags={["Python", "FastAPI", "PostgreSQL RLS"]}
+				>
+					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+					<Fragment slot="placeholder-text">Tenancy &amp; RLS Diagram Placeholder</Fragment>
+				</ProjectCard>
+
+				<!-- Centinela -->
+				<ProjectCard
+					title="Centinela: Enterprise RAG Microservice"
+					href="/work/centinela"
+					repo="https://github.com/lein-adq/knowledge-service"
+					year="2026"
+					description="Vector search over business policies and audit logs, built with hexagonal architecture around LangChain, HuggingFace embeddings and pgvector. Companion to a standalone document RAG pipeline."
+					tags={["Python", "LangChain", "pgvector"]}
+				>
+					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+					<Fragment slot="placeholder-text">Hexagonal Architecture Placeholder</Fragment>
+				</ProjectCard>
+
+				<!-- Poker -->
+				<ProjectCard
+					title="Multiplayer Texas Hold'em"
+					href="/work/poker"
+					repo="https://github.com/lein-adq/poker"
+					year="2026"
+					description="Real-time poker with a .NET and SignalR backend, Redis, and the Ory stack (Kratos and Oathkeeper) for identity and an auth-proxy edge, all brought up with one docker compose command."
+					tags={[".NET", "SignalR", "React", "Ory"]}
+				>
+					<svg slot="icon" class="w-10 h-10 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+					<Fragment slot="placeholder-text">Gameplay Screenshot Placeholder</Fragment>
+				</ProjectCard>
+
 				<!-- Project 2 -->
 				<ProjectCard
 					title="Browser Cookie Tree CLI"

@@ -1,0 +1,48 @@
+---
+layout: ../../layouts/WorkLayout.astro
+title: Multiplayer Texas Hold'em
+description: A real-time poker platform with a tested game engine, per-viewer privacy over SignalR, and passwordless identity through the Ory stack.
+role: Author
+timeline: 2026
+stack:
+  - .NET
+  - SignalR
+  - Redis
+  - React
+  - Ory Kratos
+  - Docker
+---
+
+## The Constraint & Objective
+
+Poker is a hard real-time problem because correctness and secrecy both matter: chips must never be created or lost, and each player may only ever receive the cards they are allowed to see. The objective was a full multiplayer game, from identity to table UI, where those two properties are enforced by the server and verified by tests.
+
+## System Architecture
+
+<div class="bg-slate-100 p-8 rounded-lg overflow-x-auto text-sm my-8 group">
+	<div class="font-mono text-slate-500 mb-4 transition-opacity group-hover:text-slate-800">
+		[ React client ] -> [ Oathkeeper (auth proxy) ] -> [ .NET API + SignalR hubs ] -> [ Postgres + Redis ]   ·   [ Kratos (identity) ]
+	</div>
+</div>
+
+Oathkeeper sits at the edge and injects identity headers that the API trusts. Kratos handles passwordless email-code sign-in, with an email-domain allow-list enforced through a registration webhook. The whole stack, including a second Postgres for Kratos and a mail catcher, starts with one `docker compose` command.
+
+## Key Technical Decisions
+
+- **A real game engine:** A 7-card hand evaluator, a betting-round state machine with side pots, a full hand lifecycle with automatic run-out on all-in, and a Monte Carlo equity calculator.
+- **Per-viewer privacy:** SignalR hubs send each player a view of the table in which opponents' hole cards are hidden until showdown or an all-in reveal. Hub-boundary tests cover this.
+- **Append-only wallet ledger:** Balances are derived from a ledger, which supports the signup grant, welcome gift and timezone-aware daily gift.
+- **Redis where it fits:** It backs the SignalR backplane, the one-active-table lock, the distributed table lock and the daily-gift dedupe key.
+- **No test-only auth bypass:** The end-to-end test registers through Kratos for real, reading the emailed code from the mail catcher.
+
+## Testing
+
+The backend has 611 tests, including randomised property tests that check chip conservation across whole sessions, and SignalR tests for privacy and disconnects. CI runs the backend and frontend checks on every push and pull request, with a Playwright end-to-end run nightly.
+
+That end-to-end test found three real breakages on its first runs: single-page-app deep links returning 404, duplicated CORS headers blocking every API call, and the API port being published to the host, which was an authentication bypass.
+
+## Known Limits
+
+Live table state, including deck order, is held in-process, so the API currently runs as a single instance. Redis is used for locks and the backplane, not for replicating hand state. Authorization is plain domain logic, because no relationship-based permission engine was needed.
+
+[View source on GitHub ↗](https://github.com/lein-adq/poker)

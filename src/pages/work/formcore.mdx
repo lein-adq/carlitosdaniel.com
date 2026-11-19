@@ -1,0 +1,42 @@
+---
+layout: ../../layouts/WorkLayout.astro
+title: "FormCore: Multi-Tenant Form Backend"
+description: A form backend-as-a-service where Postgres row-level security, not application code, decides who can see what.
+role: Author
+timeline: 2025
+stack:
+  - Python
+  - FastAPI
+  - PostgreSQL RLS
+  - JWT
+  - Docker
+---
+
+## The Constraint & Objective
+
+A form backend holds other people's data: every workspace's forms, folders and submissions live side by side. The failure that matters is a tenant seeing another tenant's rows, and application-level permission checks are exactly where that kind of bug hides.
+
+The objective was a reusable backend that stays safe even when the application code is wrong.
+
+## System Architecture
+
+<div class="bg-slate-100 p-8 rounded-lg overflow-x-auto text-sm my-8 group">
+	<div class="font-mono text-slate-500 mb-4 transition-opacity group-hover:text-slate-800">
+		[ Client + JWT + X-Workspace-ID ] -> [ FastAPI ] -> [ Session variables ] -> [ PostgreSQL + RLS policies ]
+	</div>
+</div>
+
+The service is structured with a hexagonal layout and clear module boundaries. Workspaces are the tenancy boundary: forms, folders and submissions all belong to one, and a user can be a member of several workspaces with a different role in each.
+
+## Key Technical Decisions
+
+- **RLS is authoritative:** FastAPI does not enforce authorization; Postgres does. Every database query is scoped to the caller's workspace membership through PostgreSQL session variables, so a bug in the application layer cannot widen what a query is allowed to return.
+- **Explicit workspace context:** Every authenticated request must carry an `X-Workspace-ID` header. The tenant being acted on is never inferred.
+- **Workspace-level roles:** Membership and role are per workspace, which allows one account to participate in several tenants without sharing data between them.
+- **Reproducible setup:** The whole stack comes up with `docker compose up -d --build`, with interactive API docs at `/docs` and a health endpoint.
+
+## Outcomes
+
+The result is a small, reusable form service whose isolation guarantee lives in the database. The repository documents the security model, schema, migrations and a production checklist alongside the code.
+
+[View source on GitHub ↗](https://github.com/lein-adq/form_submission_service)

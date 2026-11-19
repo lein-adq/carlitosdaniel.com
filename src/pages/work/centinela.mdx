@@ -1,0 +1,48 @@
+---
+layout: ../../layouts/WorkLayout.astro
+title: "Centinela: Enterprise RAG Microservice"
+description: A vector-search microservice over business policies and audit logs, built so the embedding model and vector store can be swapped without touching business logic.
+role: Author
+timeline: 2026
+stack:
+  - Python
+  - FastAPI
+  - LangChain
+  - pgvector
+  - HuggingFace
+---
+
+## The Constraint & Objective
+
+Retrieval code tends to get welded to one framework, one embedding model and one database. The objective for Centinela was a small knowledge service that other systems can call over HTTP, with those choices kept behind clear boundaries so they can change later.
+
+It covers two kinds of content: business policy documents, and the reasons humans gave when rejecting something, so past decisions can be found again.
+
+## System Architecture
+
+<div class="bg-slate-100 p-8 rounded-lg overflow-x-auto text-sm my-8 group">
+	<div class="font-mono text-slate-500 mb-4 transition-opacity group-hover:text-slate-800">
+		[ API ] -> [ Use cases ] -> [ Ports ] -> [ Adapters: LangChain + HuggingFace embeddings + PGVector ]
+	</div>
+</div>
+
+The service follows hexagonal architecture. LangChain, HuggingFace embeddings and PGVector all sit in adapters behind ports, so the domain and use cases do not import them.
+
+## API Surface
+
+- `POST /api/v1/knowledge/ingest/document` uploads a PDF and embeds it.
+- `POST /api/v1/knowledge/ingest/audit` stores a human rejection reason.
+- `POST /api/v1/knowledge/search` runs a vector search.
+- `GET /health` reports liveness and database connectivity.
+
+## Key Technical Decisions
+
+- **Ports and adapters:** Framework and vendor choices are confined to the adapter layer.
+- **Configurable embeddings:** The embedding model is set through `CENTINELA_EMBEDDING_MODEL` (default `all-MiniLM-L6-v2`), not hard-coded.
+- **Twelve-factor configuration:** The database URL, model and log level all come from environment variables.
+
+## Companion Project
+
+The same architectural approach appears in a standalone [document RAG pipeline](https://github.com/lein-adq/Document-RAG-Pipeline): PDF and text upload, token-based chunking with overlap, selectable embedding providers (OpenAI or Sentence Transformers), and semantic search over PostgreSQL with pgvector. Its documentation flags that the database vector dimension (384 by default) must match the embedding model's output, and ships a migration for fixing a mismatch.
+
+[View source on GitHub ↗](https://github.com/lein-adq/knowledge-service)
