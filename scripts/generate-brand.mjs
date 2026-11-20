@@ -45,7 +45,10 @@ writeFileSync(join(root, "public/favicon.svg"), markSvg({ scheme: "auto" }) + "\
 const card = ({ kicker, title, sub }) => `
 <div style="position:relative;width:1200px;height:630px;padding:72px 80px;display:flex;flex-direction:column;justify-content:space-between">
   <div style="position:absolute;left:0;top:0;bottom:0;width:14px;background:var(--link)"></div>
-  <div style="font-family:Newsreader;font-size:34px;font-weight:500">Carlos Daniel</div>
+  <div style="display:flex;align-items:center;gap:24px">
+    ${markSvg({ scheme: "dark", size: 88 })}
+    <div style="font-family:Newsreader;font-size:34px;font-weight:500">Carlos Daniel</div>
+  </div>
   <div>
     <div style="font-size:26px;color:var(--link);font-weight:600;letter-spacing:.02em;margin-bottom:22px">${kicker}</div>
     <div style="font-family:Newsreader;font-weight:400;font-size:${title.length > 44 ? 68 : 82}px;line-height:1.05;letter-spacing:-.02em;max-width:1000px">${title}</div>
