@@ -83,13 +83,47 @@ const jsonLd = {
 			gsap.registerPlugin(ScrollTrigger);
 
 			// Respect users who ask for less motion: keep native scrolling.
-			if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-				const lenis = new Lenis({ lerp: 0.1 });
+			const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+			let lenis: Lenis | null = null;
+
+			if (!reduceMotion) {
+				lenis = new Lenis({ lerp: 0.1 });
 
 				// Drive Lenis from the GSAP ticker (single RAF loop) and keep ScrollTrigger in sync.
 				lenis.on("scroll", ScrollTrigger.update);
-				gsap.ticker.add((time) => lenis.raf(time * 1000));
+				gsap.ticker.add((time) => lenis!.raf(time * 1000));
 				gsap.ticker.lagSmoothing(0);
+			}
+
+			// In-page section links scroll without leaving "#section" in the address bar.
+			function scrollToId(id: string) {
+				const el = document.getElementById(id);
+				if (!el) return false;
+				const offset = -(parseFloat(getComputedStyle(el).scrollMarginTop) || 0);
+				if (lenis) lenis.scrollTo(el, { offset });
+				else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + offset, behavior: "auto" });
+				// Keep keyboard and screen-reader users oriented.
+				el.setAttribute("tabindex", "-1");
+				el.focus({ preventScroll: true });
+				return true;
+			}
+
+			document.addEventListener("click", (e) => {
+				if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+				const a = (e.target as Element).closest("a[href]") as HTMLAnchorElement | null;
+				if (!a || a.target === "_blank") return;
+				const url = new URL(a.href, location.href);
+				if (url.origin !== location.origin || url.pathname !== location.pathname || !url.hash) return;
+				if (scrollToId(decodeURIComponent(url.hash.slice(1)))) e.preventDefault();
+			});
+
+			// Arriving from another page via "/#projects": land on the section, then tidy the URL.
+			if (location.hash) {
+				const id = decodeURIComponent(location.hash.slice(1));
+				window.addEventListener("load", () => {
+					scrollToId(id);
+					history.replaceState(null, "", location.pathname + location.search);
+				});
 			}
 		</script>
 	</body>
