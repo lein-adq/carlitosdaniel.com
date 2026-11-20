@@ -1,4 +1,5 @@
 ---
+import "@fontsource-variable/caveat";
 // A ball-chain pull cord for the light/dark theme, like a ceiling lamp.
 // Pointer devices: fixed to the top of the viewport (right corner on wide screens, centred
 // below ~1088px) and hidden until the cursor comes near.
@@ -28,6 +29,25 @@
 			aria-pressed="false"
 			class="pointer-events-auto cursor-grab touch-none outline-none"
 		></circle>
+	</svg>
+</div>
+
+<div
+	id="theme-hint"
+	aria-hidden="true"
+	class="fixed z-[59] pointer-events-none opacity-0 transition-opacity duration-700 text-ink-soft"
+	style="font-family: 'Caveat Variable', cursive; width: 150px;"
+>
+	<span id="hint-text" class="block text-[22px] leading-none -rotate-6 origin-bottom-left whitespace-nowrap"></span>
+	<svg id="hint-arrow-up" viewBox="0 0 110 56" width="110" height="56" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="hidden mt-1">
+		<path d="M6 8 C 20 44, 62 52, 100 20"></path>
+		<path d="M8 11 C 24 46, 64 50, 101 22"></path>
+		<path d="M86 22 L100 20 L95 33"></path>
+	</svg>
+	<svg id="hint-arrow-down" viewBox="0 0 110 56" width="110" height="56" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="hidden mt-1 ml-auto">
+		<path d="M6 6 C 30 4, 70 14, 96 46"></path>
+		<path d="M8 9 C 32 6, 72 16, 98 47"></path>
+		<path d="M94 32 L96 46 L83 41"></path>
 	</svg>
 </div>
 
@@ -83,9 +103,51 @@
 		window.setTimeout(() => root.classList.remove("theme-anim"), 400);
 
 		announce(dark);
+		dismissHint(true);
 	}
 	let announce: (dark: boolean) => void = () => {};
 	const toggle = () => setDark(!root.classList.contains("dark"));
+
+	// ---- Sloppy hint: tells first-time visitors the switch exists ------------
+	const hint = document.getElementById("theme-hint")!;
+	const hintText = document.getElementById("hint-text")!;
+	let hintOn = false;
+	let hintTimer = 0;
+	const seen = () => {
+		try { return localStorage.getItem("theme-hint-seen") === "1" || sessionStorage.getItem("theme-hint-skip") === "1"; } catch { return false; }
+	};
+	function dismissHint(markSeen: boolean) {
+		window.clearTimeout(hintTimer);
+		if (hintOn) { hint.style.opacity = "0"; hintOn = false; }
+		try {
+			sessionStorage.setItem("theme-hint-skip", "1");
+			if (markSeen) localStorage.setItem("theme-hint-seen", "1");
+		} catch {}
+	}
+	function showHint() {
+		if (seen()) return;
+		const dark = root.classList.contains("dark");
+		const verb = dark ? "lights on" : "lights off";
+		if (touchMode) {
+			hintText.textContent = `tap to ${verb}`;
+			document.getElementById("hint-arrow-down")!.classList.remove("hidden");
+			hint.style.right = "58px";
+			hint.style.bottom = "66px";
+			hintText.style.transformOrigin = "bottom right";
+			hintText.style.textAlign = "right";
+		} else {
+			hintText.textContent = `approach to ${verb}`;
+			document.getElementById("hint-arrow-up")!.classList.remove("hidden");
+			const r = anchor.getBoundingClientRect();
+			hint.style.left = `${Math.max(12, r.left - 190)}px`;
+			hint.style.top = "112px";
+		}
+		hintOn = true;
+		hint.style.opacity = "1";
+		hintTimer = window.setTimeout(() => dismissHint(false), 9000);
+	}
+	window.addEventListener("scroll", () => hintOn && window.scrollY > 200 && dismissHint(false), { passive: true });
+	window.addEventListener("load", () => window.setTimeout(showHint, 2200));
 
 	function initCord() {
 	hit.setAttribute("aria-pressed", String(root.classList.contains("dark")));
@@ -201,6 +263,7 @@
 	function show(on: boolean) {
 		if (on === visible) return;
 		visible = on;
+		if (on) dismissHint(true);
 		anchor.classList.toggle("opacity-0", !on);
 		anchor.classList.toggle("-translate-y-3", !on);
 		hit.style.pointerEvents = on ? "auto" : "none";
