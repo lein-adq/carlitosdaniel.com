@@ -40,6 +40,14 @@
 
 }
 
+/* Brief cross-fade while the theme flips (class is added by the pull cord). */
+html.theme-anim,
+html.theme-anim *,
+html.theme-anim *::before,
+html.theme-anim *::after {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, fill 0.3s ease, stroke 0.3s ease !important;
+}
+
 /* Lenis recommended base styles */
 html.lenis,
 html.lenis body {

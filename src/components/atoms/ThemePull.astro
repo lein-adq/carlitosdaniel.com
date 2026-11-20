@@ -1,0 +1,335 @@
+---
+// A ball-chain pull cord for the light/dark theme, like a ceiling lamp.
+// Pointer devices: fixed to the top of the viewport (right corner on wide screens, centred
+// below ~1088px) and hidden until the cursor comes near.
+// Touch devices have no cursor and fat fingers, so they get a wall light switch instead:
+// a small rocker plate in the bottom-right corner. Tap it, it snaps and buzzes. The chain is a
+// verlet rope: drag it, fling it, bat it with the cursor. Pull the handle down (or tap it,
+// or press Enter) and the lights flip.
+---
+<div
+	id="theme-pull-anchor"
+	class="fixed top-0 left-1/2 min-[1088px]:left-auto min-[1088px]:right-8 w-0 h-0 z-[60] pointer-events-none opacity-0 -translate-y-3 transition duration-300"
+>
+	<svg viewBox="-60 0 120 200" width="120" height="200" class="absolute -left-[60px] top-0 overflow-visible">
+		<polyline id="chain-line" points="" fill="none" class="stroke-ink-soft" stroke-width="1" stroke-linejoin="round"></polyline>
+		<g id="chain-beads" class="fill-ink-soft"></g>
+		<circle id="pull-handle" cx="0" cy="80" r="6" class="fill-ink stroke-paper" stroke-width="2"></circle>
+		<text id="pull-note" x="-16" y="84" text-anchor="end" class="fill-muted font-mono" font-size="11" opacity="0"></text>
+		<circle
+			id="pull-hit"
+			cx="0"
+			cy="80"
+			r="16"
+			fill="transparent"
+			role="button"
+			tabindex="0"
+			aria-label="Toggle dark mode"
+			aria-pressed="false"
+			class="pointer-events-auto cursor-grab touch-none outline-none"
+		></circle>
+	</svg>
+</div>
+
+<button
+	id="wall-switch"
+	type="button"
+	role="switch"
+	aria-checked="false"
+	aria-label="Dark mode"
+	class="hidden fixed z-[60] w-11 h-14 right-4 bottom-4 touch-manipulation select-none outline-none group"
+	style="right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom));"
+>
+	<span class="absolute inset-0 rounded-lg border border-rule bg-paper group-focus-visible:border-link"></span>
+	<span class="absolute inset-0 grid place-items-center" style="perspective: 90px">
+		<span id="wall-rocker" class="block w-5 h-8 rounded-[4px]" data-on="true"></span>
+	</span>
+	<span
+		id="wall-note"
+		class="absolute right-0 bottom-full mb-2 font-mono text-[11px] text-muted whitespace-nowrap opacity-0 transition-opacity duration-200 pointer-events-none"
+	></span>
+</button>
+
+<style is:global>
+	#wall-rocker {
+		background: linear-gradient(to bottom, var(--color-ink) 50%, color-mix(in oklab, var(--color-ink) 62%, var(--color-paper)) 50%);
+		transition: transform 0.28s cubic-bezier(0.3, 1.8, 0.5, 1);
+	}
+	#wall-rocker[data-on="true"] { transform: rotateX(24deg); }
+	#wall-rocker[data-on="false"] { transform: rotateX(-24deg) scaleY(-1); }
+</style>
+
+<script>
+	const root = document.documentElement;
+	const anchor = document.getElementById("theme-pull-anchor")!;
+	const line = document.getElementById("chain-line")!;
+	const beadsG = document.getElementById("chain-beads")!;
+	const handle = document.getElementById("pull-handle")!;
+	const hit = document.getElementById("pull-hit")!;
+	const note = document.getElementById("pull-note")!;
+	const meta = document.getElementById("theme-color");
+	const SVG_NS = "http://www.w3.org/2000/svg";
+
+	const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+	// Touch-first devices: no cursor to wait for, and fingers are too fat for a thin chain.
+	const touchMode = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+
+	// ---- Theme -------------------------------------------------------------
+		function setDark(dark: boolean) {
+		root.classList.add("theme-anim");
+		root.classList.toggle("dark", dark);
+		meta?.setAttribute("content", dark ? "hsl(280, 50%, 10%)" : "hsl(280, 50%, 90%)");
+		try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch {}
+		window.setTimeout(() => root.classList.remove("theme-anim"), 400);
+
+		announce(dark);
+	}
+	let announce: (dark: boolean) => void = () => {};
+	const toggle = () => setDark(!root.classList.contains("dark"));
+
+	function initCord() {
+	hit.setAttribute("aria-pressed", String(root.classList.contains("dark")));
+	let noteTimer = 0;
+	announce = (dark) => {
+		note.textContent = dark ? "lights off." : "lights on.";
+		note.setAttribute("opacity", "1");
+		window.clearTimeout(noteTimer);
+		noteTimer = window.setTimeout(() => note.setAttribute("opacity", "0"), 1400);
+		hit.setAttribute("aria-pressed", String(dark));
+	};
+
+	// ---- Chain: verlet rope, point 0 pinned to the ceiling -------------------
+	const N = 10; // links
+	const SEG = 8; // px between beads
+	const L = N * SEG; // rest length
+	const DT = 1 / 120; // fixed physics step
+	const G = 2200; // px/s²
+	const DAMP = 0.9965; // per step
+	const ITER = 14;
+	const THRESHOLD = L + 14; // pointer distance that counts as a pull
+	const MAX_STRETCH = 1.14; // chain visibly stretches up to 14% when yanked
+
+	type P = { x: number; y: number; px: number; py: number };
+	const pts: P[] = Array.from({ length: N + 1 }, (_, i) => ({ x: 0, y: i * SEG, px: 0, py: i * SEG }));
+	const last = pts[N];
+
+	const beads: SVGCircleElement[] = [];
+	for (let i = 1; i < N; i++) {
+		const c = document.createElementNS(SVG_NS, "circle");
+		c.setAttribute("r", "2.3");
+		beadsG.appendChild(c);
+		beads.push(c);
+	}
+
+	let seg = SEG;
+	let dragging = false;
+	let target = { x: 0, y: L };
+	let running = false;
+	let visible = false;
+	let tPrev = 0;
+	let acc = 0;
+
+	function simulate() {
+		// Pinned ceiling point.
+		pts[0].x = pts[0].px = 0;
+		pts[0].y = pts[0].py = 0;
+
+		for (let i = 1; i <= N; i++) {
+			const p = pts[i];
+			if (dragging && i === N) continue; // handle follows the pointer
+			const vx = (p.x - p.px) * DAMP;
+			const vy = (p.y - p.py) * DAMP;
+			p.px = p.x; p.py = p.y;
+			p.x += vx;
+			p.y += vy + G * DT * DT;
+		}
+		for (let k = 0; k < ITER; k++) {
+			for (let i = 0; i < N; i++) {
+				const a = pts[i], b = pts[i + 1];
+				const dx = b.x - a.x, dy = b.y - a.y;
+				const d = Math.hypot(dx, dy) || 1e-6;
+				const diff = (d - seg) / d;
+				const aPinned = i === 0;
+				const bPinned = dragging && i + 1 === N;
+				if (aPinned && bPinned) continue;
+				const wa = aPinned ? 0 : bPinned ? 1 : 0.5;
+				const wb = bPinned ? 0 : aPinned ? 1 : 0.5;
+				a.x += dx * diff * wa; a.y += dy * diff * wa;
+				b.x -= dx * diff * wb; b.y -= dy * diff * wb;
+			}
+		}
+	}
+
+	function draw() {
+		line.setAttribute("points", pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" "));
+		beads.forEach((c, i) => {
+			c.setAttribute("cx", pts[i + 1].x.toFixed(1));
+			c.setAttribute("cy", pts[i + 1].y.toFixed(1));
+		});
+		const hx = last.x.toFixed(1), hy = (last.y + 4).toFixed(1);
+		handle.setAttribute("cx", hx); handle.setAttribute("cy", hy);
+		hit.setAttribute("cx", hx); hit.setAttribute("cy", hy);
+		note.setAttribute("x", (last.x - 16).toFixed(1));
+		note.setAttribute("y", (last.y + 8).toFixed(1));
+	}
+
+	function frame(t: number) {
+		acc += Math.min((t - tPrev) / 1000, 1 / 20);
+		tPrev = t;
+		if (dragging) { last.px = last.x; last.py = last.y; last.x = target.x; last.y = target.y; }
+		while (acc >= DT) { simulate(); acc -= DT; }
+		draw();
+
+		let energy = 0;
+		for (const p of pts) energy += Math.abs(p.x - p.px) + Math.abs(p.y - p.py) + Math.abs(p.x);
+		if (!dragging && !visible && energy < 0.4) { running = false; return; }
+		requestAnimationFrame(frame);
+	}
+	function start() {
+		if (running || reduceMotion) return;
+		running = true;
+		tPrev = performance.now();
+		requestAnimationFrame(frame);
+	}
+	function impulse(from: number, vx: number, vy: number) {
+		for (let i = from; i <= N; i++) { pts[i].px -= vx * DT; pts[i].py -= vy * DT; }
+	}
+	draw();
+
+	// ---- Reveal near the top-right corner -----------------------------------
+	let hideTimer = 0;
+	function show(on: boolean) {
+		if (on === visible) return;
+		visible = on;
+		anchor.classList.toggle("opacity-0", !on);
+		anchor.classList.toggle("-translate-y-3", !on);
+		hit.style.pointerEvents = on ? "auto" : "none";
+		if (on) { impulse(3, (Math.random() - 0.5) * 160, 0); start(); } // a little hello swing
+	}
+	const near = (cx: number, cy: number) => {
+		const r = anchor.getBoundingClientRect();
+		return Math.abs(cx - r.left) < 140 && cy < r.top + 200;
+	};
+
+	let mx = 0, my = 0, mt = 0;
+	window.addEventListener("pointermove", (e) => {
+		if (e.pointerType === "touch") return;
+		if (dragging || near(e.clientX, e.clientY)) {
+			window.clearTimeout(hideTimer);
+			show(true);
+		} else if (visible) {
+			window.clearTimeout(hideTimer);
+			hideTimer = window.setTimeout(() => !dragging && show(false), 700);
+		}
+		// Bat the chain with the cursor.
+		if (visible && !dragging) {
+			const r = anchor.getBoundingClientRect();
+			const dtm = Math.max(e.timeStamp - mt, 1);
+			const cvx = Math.max(-500, Math.min(500, ((e.clientX - mx) / dtm) * 1000));
+			const cvy = Math.max(-500, Math.min(500, ((e.clientY - my) / dtm) * 1000));
+			for (let i = 1; i <= N; i++) {
+				if (Math.hypot(e.clientX - (r.left + pts[i].x), e.clientY - (r.top + pts[i].y)) < 14) {
+					pts[i].px -= cvx * DT * 0.35;
+					pts[i].py -= cvy * DT * 0.35;
+					start();
+				}
+			}
+		}
+		mx = e.clientX; my = e.clientY; mt = e.timeStamp;
+	});
+	hit.addEventListener("focus", () => show(true));
+	hit.addEventListener("blur", () => show(false));
+
+	// ---- Drag / tap / keyboard ----------------------------------------------
+	let moved = false;
+	let startX = 0, startY = 0;
+	let lx = 0, ly = 0, lt = 0, vx = 0, vy = 0;
+
+	function toLocal(e: PointerEvent) {
+		const r = anchor.getBoundingClientRect();
+		return { x: e.clientX - r.left, y: e.clientY - r.top - 4 };
+	}
+
+	hit.addEventListener("pointerdown", (e) => {
+		dragging = true; moved = false;
+		startX = e.clientX; startY = e.clientY;
+		hit.setPointerCapture(e.pointerId);
+		hit.style.cursor = "grabbing";
+		const p = toLocal(e);
+		lx = p.x; ly = p.y; lt = e.timeStamp; vx = vy = 0;
+		target = { x: last.x, y: last.y };
+		start();
+	});
+	hit.addEventListener("pointermove", (e) => {
+		if (!dragging) return;
+		if (Math.hypot(e.clientX - startX, e.clientY - startY) > 3) moved = true;
+		const p = toLocal(e);
+		const ny = Math.max(p.y, 12); // can't be pushed up through the ceiling
+		const dist = Math.hypot(p.x, ny);
+		// The chain stretches a little as you yank, never past MAX_STRETCH.
+		const stretch = Math.min(MAX_STRETCH, Math.max(1, dist / L));
+		seg = SEG * stretch;
+		const reach = L * stretch;
+		const k = dist > reach ? reach / dist : 1;
+		target = { x: p.x * k, y: ny * k };
+		const dtm = Math.max((e.timeStamp - lt) / 1000, 0.001);
+		vx = (p.x - lx) / dtm; vy = (p.y - ly) / dtm;
+		lx = p.x; ly = p.y; lt = e.timeStamp;
+		(hit as any)._dist = dist;
+	});
+	const release = () => {
+		if (!dragging) return;
+		dragging = false;
+		seg = SEG;
+		hit.style.cursor = "";
+		if (!moved) {
+			impulse(N - 3, 0, 700); // a tap is a quick tug
+			toggle();
+		} else {
+			if (((hit as any)._dist ?? 0) >= THRESHOLD) toggle();
+			const cap = (v: number) => Math.max(-1200, Math.min(1200, v));
+			last.px = last.x - cap(vx) * DT; // fling
+			last.py = last.y - cap(vy) * DT;
+		}
+		if (reduceMotion) { pts.forEach((p, i) => { p.x = p.px = 0; p.y = p.py = i * SEG; }); draw(); }
+		start();
+	};
+	hit.addEventListener("pointerup", release);
+	hit.addEventListener("pointercancel", release);
+
+	hit.addEventListener("keydown", (e) => {
+		if (e.key !== "Enter" && e.key !== " ") return;
+		e.preventDefault();
+		impulse(N - 3, 0, 700);
+		toggle();
+		start();
+	});
+	}
+
+	// ---- Wall switch (touch) -------------------------------------------------
+	function initSwitch() {
+		const sw = document.getElementById("wall-switch")!;
+		const rocker = document.getElementById("wall-rocker")!;
+		const wnote = document.getElementById("wall-note")!;
+		let timer = 0;
+		const sync = (dark: boolean) => {
+			rocker.dataset.on = String(!dark); // light mode = lights on = rocker up
+			sw.setAttribute("aria-checked", String(dark));
+		};
+		sync(root.classList.contains("dark"));
+		announce = (dark) => {
+			sync(dark);
+			wnote.textContent = dark ? "lights off." : "lights on.";
+			wnote.style.opacity = "1";
+			window.clearTimeout(timer);
+			timer = window.setTimeout(() => (wnote.style.opacity = "0"), 1400);
+			if ("vibrate" in navigator) navigator.vibrate(12); // the satisfying click
+		};
+		anchor.remove();
+		sw.classList.remove("hidden");
+		sw.addEventListener("click", toggle);
+	}
+
+	if (touchMode) initSwitch();
+	else initCord();
+</script>
