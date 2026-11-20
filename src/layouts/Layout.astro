@@ -5,27 +5,91 @@ import "../styles/global.css";
 import Header from "../components/organisms/Header.astro";
 import ThemePull from "../components/atoms/ThemePull.astro";
 
+import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+import newsreaderLatin from "@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url";
+
 interface Props {
 	title: string;
 	description?: string;
+	/** Root-relative path of the 1200x630 share image. */
+	image?: string;
+	imageAlt?: string;
+	type?: "website" | "article";
+	/** Keep the page out of search results (it can still be crawled for links). */
+	noindex?: boolean;
+	/** Extra schema.org nodes for this page, merged into the site-wide @graph. */
+	schema?: Record<string, unknown>[];
 }
+
+const SITE_NAME = "Carlos Daniel";
+const GITHUB = "https://github.com/lein-adq";
 
 const {
 	title,
-	description = "Carlos Daniel is a backend and AI engineer building production RAG systems and real-time backends. Open to full-time roles.",
+	description = "Backend and AI engineer in Cochabamba, Bolivia. I build production RAG systems on AWS Bedrock and real-time backends. Open to full-time roles.",
+	image = "/og/home.png",
+	imageAlt = "Carlos Daniel, backend and AI engineer",
+	type = "website",
+	noindex = false,
+	schema = [],
 } = Astro.props;
 
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const site = Astro.site!;
+const canonical = new URL(Astro.url.pathname, site);
+const imageUrl = new URL(image, site).href;
+const isHome = Astro.url.pathname === "/";
 
-const jsonLd = {
-	"@context": "https://schema.org",
-	"@type": "Person",
-	name: "Carlos Daniel",
-	url: Astro.site?.toString(),
-	jobTitle: "Backend & AI Engineer",
-	address: { "@type": "PostalAddress", addressLocality: "Cochabamba", addressCountry: "BO" },
-	knowsLanguage: ["en", "es"],
-};
+const personId = `${site.href}#person`;
+const siteId = `${site.href}#website`;
+
+const graph = [
+	{
+		"@type": "WebSite",
+		"@id": siteId,
+		url: site.href,
+		name: SITE_NAME,
+		inLanguage: "en",
+		publisher: { "@id": personId },
+	},
+	{
+		"@type": "Person",
+		"@id": personId,
+		name: SITE_NAME,
+		url: site.href,
+		image: new URL("/og/home.png", site).href,
+		jobTitle: "Backend & AI Engineer",
+		description:
+			"Backend and AI engineer who builds production RAG systems and real-time backends.",
+		address: { "@type": "PostalAddress", addressLocality: "Cochabamba", addressCountry: "BO" },
+		knowsLanguage: ["en", "es"],
+		knowsAbout: [
+			"Retrieval-augmented generation",
+			"Generative AI",
+			"AWS Bedrock",
+			"Backend engineering",
+			"Real-time systems",
+			"PostgreSQL",
+			"Python",
+			".NET",
+		],
+		sameAs: [GITHUB],
+	},
+	...(isHome
+		? [
+				{
+					"@type": "ProfilePage",
+					"@id": `${site.href}#profile`,
+					url: site.href,
+					name: title,
+					description,
+					mainEntity: { "@id": personId },
+					isPartOf: { "@id": siteId },
+				},
+			]
+		: []),
+	...schema,
+];
+const jsonLd = { "@context": "https://schema.org", "@graph": graph };
 ---
 
 <!doctype html>
@@ -34,8 +98,20 @@ const jsonLd = {
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="canonical" href={canonical} />
+		<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		{!noindex && <link rel="canonical" href={canonical} />}
+		<link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+		<link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href={newsreaderLatin} as="font" type="font/woff2" crossorigin />
 		<meta name="generator" content={Astro.generator} />
+		<meta name="author" content={SITE_NAME} />
+		<meta
+			name="robots"
+			content={noindex ? "noindex, follow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"}
+		/>
 		<meta id="theme-color" name="theme-color" content="hsl(280, 50%, 90%)" />
 		<script is:inline>
 			(function () {
@@ -49,14 +125,22 @@ const jsonLd = {
 		<title>{title}</title>
 		<meta name="description" content={description} />
 
-		<meta property="og:type" content="website" />
-		<meta property="og:site_name" content="Carlos Daniel" />
+		<meta property="og:type" content={type} />
+		<meta property="og:site_name" content={SITE_NAME} />
+		<meta property="og:locale" content="en_US" />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:url" content={canonical} />
-		<meta name="twitter:card" content="summary" />
+		<meta property="og:image" content={imageUrl} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={imageAlt} />
+		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={imageUrl} />
+		<meta name="twitter:image:alt" content={imageAlt} />
+		<link rel="me" href={GITHUB} />
 
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	</head>

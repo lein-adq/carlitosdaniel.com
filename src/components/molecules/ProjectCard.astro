@@ -35,10 +35,10 @@ const { title, href, repo, year, description, why, stack } = Astro.props;
 
 	<div class="flex md:flex-col gap-x-6 gap-y-2.5 text-sm font-medium md:pt-2 md:items-end">
 		{href && (
-			<a href={href} class="text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors whitespace-nowrap">Read the case study →</a>
+			<a href={href} aria-label={`Read the case study: ${title}`} class="text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors whitespace-nowrap">Read the case study →</a>
 		)}
 		{repo && (
-			<a href={repo} target="_blank" rel="noopener noreferrer" class="text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors whitespace-nowrap">Source on GitHub ↗</a>
+			<a href={repo} target="_blank" rel="noopener noreferrer" aria-label={`${title}: source on GitHub (opens in a new tab)`} class="text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors whitespace-nowrap">Source on GitHub ↗</a>
 		)}
 	</div>
 </article>
