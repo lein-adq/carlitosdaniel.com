@@ -80,23 +80,35 @@ for (const slug of ["formcore", "centinela", "poker", "rag-agent"]) {
 }
 
 // ---- Icons: "CD" monogram ---------------------------------------------------
-const icon = (size, radius) => `
-<div style="width:${size}px;height:${size}px;background:var(--ink);border-radius:${radius}px;display:grid;place-items:center">
-  <span style="font-family:Newsreader;font-weight:500;font-size:${size * 0.5}px;letter-spacing:-.03em;color:var(--paper);line-height:1">CD</span>
-</div>`;
-shot(icon(180, 0), join(root, "public/apple-touch-icon.png"), 180, 180); // iOS rounds it itself
-shot(icon(192, 0), join(root, "public/icon-192.png"), 192, 192);
-shot(icon(512, 0), join(root, "public/icon-512.png"), 512, 512);
-const ico48 = join(tmp, "favicon-48.png");
-shot(icon(48, 10), ico48, 48, 48);
-shot(icon(48, 10), join(root, "public/favicon-48.png"), 48, 48);
+// Square, solid, light-palette icons (iOS/Android round them and ignore dark mode).
+const iconPng = (out, size, opts = {}) => shot(markSvg({ scheme: "light", size, radius: 0, ...opts }), out, size, size);
+iconPng(join(root, "public/apple-touch-icon.png"), 180);
+iconPng(join(root, "public/icon-192.png"), 192);
+iconPng(join(root, "public/icon-512.png"), 512);
+// Maskable: keep the mark inside the central 80% circle so Android's crop never clips it.
+iconPng(join(root, "public/icon-512-maskable.png"), 512, { padding: 0.2 });
 
-// favicon.ico (PNG payload inside an ICO container)
-const png = readFileSync(ico48);
-const head = Buffer.alloc(22);
-head.writeUInt16LE(0, 0); head.writeUInt16LE(1, 2); head.writeUInt16LE(1, 4);
-head.writeUInt8(48, 6); head.writeUInt8(48, 7); head.writeUInt16LE(1, 10); head.writeUInt16LE(32, 12);
-head.writeUInt32LE(png.length, 14); head.writeUInt32LE(22, 18);
-writeFileSync(join(root, "public/favicon.ico"), Buffer.concat([head, png]));
+// Rounded small icons for the tab: favicon-48.png and the 16/32/48 images inside favicon.ico.
+const sizes = [16, 32, 48];
+const pngs = sizes.map((size) => {
+	const out = join(tmp, `favicon-${size}.png`);
+	shot(markSvg({ scheme: "light", size, radius: 14 }), out, size, size);
+	return readFileSync(out);
+});
+writeFileSync(join(root, "public/favicon-48.png"), pngs[2]);
+
+// favicon.ico: ICONDIR + one ICONDIRENTRY per image, PNG payloads.
+const head = Buffer.alloc(6 + 16 * sizes.length);
+head.writeUInt16LE(1, 2); // type: icon
+head.writeUInt16LE(sizes.length, 4);
+let offset = head.length;
+sizes.forEach((size, i) => {
+	const e = 6 + 16 * i;
+	head.writeUInt8(size, e); head.writeUInt8(size, e + 1);
+	head.writeUInt16LE(1, e + 4); head.writeUInt16LE(32, e + 6);
+	head.writeUInt32LE(pngs[i].length, e + 8); head.writeUInt32LE(offset, e + 12);
+	offset += pngs[i].length;
+});
+writeFileSync(join(root, "public/favicon.ico"), Buffer.concat([head, ...pngs]));
 
 console.log("Generated og images, app icons and favicon.ico");
