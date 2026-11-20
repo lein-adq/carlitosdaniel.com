@@ -27,6 +27,7 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "cf": "1.0.0-rc.2"
+    "cf": "1.0.0-rc.2",
+    "fontkit": "^3.0.0"
   }
 }
