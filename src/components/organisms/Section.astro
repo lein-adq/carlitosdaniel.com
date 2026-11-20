@@ -8,8 +8,8 @@ interface Props {
 const { id, title, subtitle } = Astro.props;
 ---
 
-<section id={id} class="pt-24 sm:pt-28 pb-6 scroll-mt-16">
-	<div class="mb-12 sm:mb-14">
+<section id={id} class="pt-16 sm:pt-20 pb-4 scroll-mt-10 sm:scroll-mt-8">
+	<div class="mb-6 sm:mb-8">
 		<h2 class="font-serif text-4xl sm:text-[2.75rem] font-normal tracking-tight text-ink mb-3">{title}</h2>
 		{subtitle && <p class="text-base text-ink-soft max-w-xl leading-relaxed">{subtitle}</p>}
 	</div>
