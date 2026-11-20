@@ -1,18 +1,35 @@
 @import "tailwindcss";
 
-@theme {
+/* Palette. `.dark` is set on <html> from the system preference (see Layout.astro). */
+:root {
+  --color-primary: hsl(280, 50%, 90%);
+  --color-secondary: hsl(280, 50%, 10%);
+  --color-tertiary: hsl(340, 80%, 20%);
+  --color-accent: hsl(220, 80%, 20%);
+  color-scheme: light;
+}
+
+.dark {
+  --color-primary: hsl(280, 50%, 10%);
+  --color-secondary: hsl(280, 50%, 90%);
+  --color-tertiary: hsl(340, 80%, 80%);
+  --color-accent: hsl(220, 80%, 80%);
+  color-scheme: dark;
+}
+
+@theme inline {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-serif: "Newsreader Variable", Georgia, "Times New Roman", serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  /* Calm, high-contrast palette. Every text color passes 4.5:1 on --color-paper. */
-  --color-paper: #fbfbf9;
-  --color-ink: #0e1116;
-  --color-ink-soft: #3a4250;
-  --color-muted: #5a6270;
-  --color-rule: #d9d8d2;
-  --color-link: #1b3a5c;
-  --color-available: #1f7a4d;
+  /* Semantic tokens derived from the four palette colors below. */
+  --color-paper: var(--color-primary);
+  --color-ink: var(--color-secondary);
+  --color-ink-soft: color-mix(in oklab, var(--color-secondary) 85%, var(--color-primary));
+  --color-muted: color-mix(in oklab, var(--color-secondary) 68%, var(--color-primary));
+  --color-rule: color-mix(in oklab, var(--color-secondary) 22%, var(--color-primary));
+  --color-link: var(--color-tertiary);
+  --color-available: var(--color-accent);
 }
 
 @layer base {
@@ -21,7 +38,6 @@
     @apply text-ink bg-paper antialiased selection:bg-rule;
   }
 
-  /* Dark mode is disabled or can be added later */
 }
 
 /* Lenis recommended base styles */

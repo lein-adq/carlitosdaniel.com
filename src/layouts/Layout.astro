@@ -35,7 +35,11 @@ const jsonLd = {
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="canonical" href={canonical} />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="theme-color" content="#fbfbf9" />
+		<meta name="theme-color" content="hsl(280, 50%, 90%)" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="hsl(280, 50%, 10%)" media="(prefers-color-scheme: dark)" />
+		<script is:inline>
+			document.documentElement.classList.toggle("dark", matchMedia("(prefers-color-scheme: dark)").matches);
+		</script>
 		<title>{title}</title>
 		<meta name="description" content={description} />
 
@@ -55,7 +59,7 @@ const jsonLd = {
 	>
 		<a
 			href="#main"
-			class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-white"
+			class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:text-paper"
 		>
 			Skip to content
 		</a>
