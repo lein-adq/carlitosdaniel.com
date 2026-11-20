@@ -1,0 +1,14 @@
+# Carlos Daniel
+
+> Backend and AI engineer in Cochabamba, Bolivia. I build production RAG systems on AWS Bedrock and real-time backends. Open to full-time roles.
+
+## Case studies
+
+- [FormCore: Multi-Tenant Form Backend](https://carlitosdaniel.com/work/formcore/): Postgres row-level security, not application code, decides who can see which rows.
+- [Centinela: Enterprise RAG Microservice](https://carlitosdaniel.com/work/centinela/): hexagonal vector-search service with swappable embedding model and vector store.
+- [Multiplayer Texas Hold'em](https://carlitosdaniel.com/work/poker/): real-time poker with a tested game engine, per-viewer privacy over SignalR and passwordless identity.
+
+## Links
+
+- [Home](https://carlitosdaniel.com/)
+- [GitHub](https://github.com/lein-adq)

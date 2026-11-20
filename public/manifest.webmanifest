@@ -1,0 +1,14 @@
+{
+  "name": "Carlos Daniel",
+  "short_name": "Carlos Daniel",
+  "description": "Backend and AI engineer building production RAG systems and real-time backends.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ecdcf2",
+  "theme_color": "#ecdcf2",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
