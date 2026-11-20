@@ -6,9 +6,11 @@
 
 - [FormCore: Multi-Tenant Form Backend](https://carlitosdaniel.com/work/formcore/): Postgres row-level security, not application code, decides who can see which rows.
 - [Centinela: Enterprise RAG Microservice](https://carlitosdaniel.com/work/centinela/): hexagonal vector-search service with swappable embedding model and vector store.
+- [End-to-End RAG & AI Agent Service](https://carlitosdaniel.com/work/rag-agent/): hybrid dense and BM25 retrieval with query reformulation, streamed answers and asynchronous ingestion.
 - [Multiplayer Texas Hold'em](https://carlitosdaniel.com/work/poker/): real-time poker with a tested game engine, per-viewer privacy over SignalR and passwordless identity.
 
 ## Links
 
 - [Home](https://carlitosdaniel.com/)
 - [GitHub](https://github.com/lein-adq)
+- [LinkedIn](https://www.linkedin.com/in/carlos-daniel-quispe-paye)

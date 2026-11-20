@@ -20,7 +20,7 @@ const email = "carlos.daniel.development@gmail.com";
 			<Section
 				id="projects"
 				title="Selected work"
-				subtitle="Three projects, each built around a constraint that had to hold."
+				subtitle="Four projects, each built around a constraint that had to hold."
 			>
 				<ProjectCard
 					title="FormCore, a multi-tenant form backend"
@@ -50,6 +50,15 @@ const email = "carlos.daniel.development@gmail.com";
 					description="A real-time game on .NET and SignalR with Redis and the Ory identity stack, backed by 611 backend tests and an end-to-end suite."
 					why="each player only ever receives the cards they are allowed to see, and chips are never created or lost."
 					stack={[".NET", "SignalR", "React", "Redis", "Ory Kratos"]}
+				/>
+
+				<ProjectCard
+					title="An end-to-end RAG and AI agent service"
+					href="/work/rag-agent"
+					year="2024"
+					description="Hybrid search (dense vectors plus BM25) with query reformulation and streamed answers, built to keep retrieval under 200ms."
+					why="ingestion runs asynchronously from the query path, so adding documents never slows answers down."
+					stack={["Python", "FastAPI", "Pinecone", "LangChain"]}
 				/>
 			</Section>
 

@@ -17,8 +17,6 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
-      // rag-agent is marked noindex in its frontmatter
-      filter: (page) => !page.includes('/work/rag-agent'),
       lastmod: new Date(),
     }),
   ]
