@@ -7,12 +7,17 @@
  * Re-run after changing a case study's title/stack or the palette. Output is committed.
  */
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { markSvg } from "./brand-mark.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const CHROME = process.env.CHROME ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+if (!existsSync(CHROME)) {
+	console.error(`Chrome not found at "${CHROME}". Set the CHROME env var to your Chrome/Chromium binary.`);
+	process.exit(1);
+}
 const fonts = (f) => `file://${root}/node_modules/@fontsource-variable/${f}`;
 const tmp = mkdtempSync(join(tmpdir(), "brand-"));
 
@@ -32,6 +37,9 @@ function shot(html, out, w, h) {
 		`--window-size=${w},${h}`, "--virtual-time-budget=4000", `--screenshot=${out}`, `file://${file}`,
 	], { stdio: "ignore" });
 }
+
+// ---- Tab icon (outlined, light/dark) ----------------------------------------
+writeFileSync(join(root, "public/favicon.svg"), markSvg({ scheme: "auto" }) + "\n");
 
 // ---- Social share cards (1200x630) -----------------------------------------
 const card = ({ kicker, title, sub }) => `
