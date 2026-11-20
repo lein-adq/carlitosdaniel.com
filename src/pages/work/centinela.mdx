@@ -12,6 +12,8 @@ stack:
   - HuggingFace
 ---
 
+import ArchDiagram from "../../components/organisms/ArchDiagram.astro";
+
 ## The Constraint & Objective
 
 Retrieval code tends to get welded to one framework, one embedding model and one database. The objective for Centinela was a small knowledge service that other systems can call over HTTP, with those choices kept behind clear boundaries so they can change later.
@@ -20,11 +22,7 @@ It covers two kinds of content: business policy documents, and the reasons human
 
 ## System Architecture
 
-<div class="bg-slate-100 p-8 rounded-lg overflow-x-auto text-sm my-8 group">
-	<div class="font-mono text-slate-500 mb-4 transition-opacity group-hover:text-slate-800">
-		[ API ] -> [ Use cases ] -> [ Ports ] -> [ Adapters: LangChain + HuggingFace embeddings + PGVector ]
-	</div>
-</div>
+<ArchDiagram id="centinela" />
 
 The service follows hexagonal architecture. LangChain, HuggingFace embeddings and PGVector all sit in adapters behind ports, so the domain and use cases do not import them.
 

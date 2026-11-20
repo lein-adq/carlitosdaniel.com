@@ -13,17 +13,15 @@ stack:
   - Docker
 ---
 
+import ArchDiagram from "../../components/organisms/ArchDiagram.astro";
+
 ## The Constraint & Objective
 
 Poker is a hard real-time problem because correctness and secrecy both matter: chips must never be created or lost, and each player may only ever receive the cards they are allowed to see. The objective was a full multiplayer game, from identity to table UI, where those two properties are enforced by the server and verified by tests.
 
 ## System Architecture
 
-<div class="bg-slate-100 p-8 rounded-lg overflow-x-auto text-sm my-8 group">
-	<div class="font-mono text-slate-500 mb-4 transition-opacity group-hover:text-slate-800">
-		[ React client ] -> [ Oathkeeper (auth proxy) ] -> [ .NET API + SignalR hubs ] -> [ Postgres + Redis ]   ·   [ Kratos (identity) ]
-	</div>
-</div>
+<ArchDiagram id="poker" />
 
 Oathkeeper sits at the edge and injects identity headers that the API trusts. Kratos handles passwordless email-code sign-in, with an email-domain allow-list enforced through a registration webhook. The whole stack, including a second Postgres for Kratos and a mail catcher, starts with one `docker compose` command.
 

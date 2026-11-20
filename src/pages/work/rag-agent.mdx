@@ -11,17 +11,15 @@ stack:
   - LangChain
 ---
 
+import ArchDiagram from "../../components/organisms/ArchDiagram.astro";
+
 ## The Constraint & Objective
 
 Building a Retrieval-Augmented Generation (RAG) pipeline is straightforward; building one that scales elegantly under load while maintaining sub-200ms retrieval latency is not. The objective was to design an AI agent service capable of ingesting thousands of internal documents, indexing them with high-density embeddings, and answering complex user queries with strict source attribution.
 
 ## System Architecture
 
-<div class="bg-slate-100 p-8 rounded-lg overflow-x-auto text-sm my-8 group">
-	<div class="font-mono text-slate-500 mb-4 transition-opacity group-hover:text-slate-800">
-		[ User Query ] -> [ FastAPI Gateway ] -> [ Query Reformulation (LLM) ] -> [ Vector Search (Pinecone) ] -> [ Context Assembly ] -> [ Final Generation (LLM) ]
-	</div>
-</div>
+<ArchDiagram id="rag-agent" />
 
 The architecture heavily emphasizes decoupling the ingestion pipeline from the query pipeline. Ingestion runs asynchronously via message queues, chunking and embedding documents without blocking the main event loop.
 

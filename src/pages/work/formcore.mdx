@@ -12,6 +12,8 @@ stack:
   - Docker
 ---
 
+import ArchDiagram from "../../components/organisms/ArchDiagram.astro";
+
 ## The Constraint & Objective
 
 A form backend holds other people's data: every workspace's forms, folders and submissions live side by side. The failure that matters is a tenant seeing another tenant's rows, and application-level permission checks are exactly where that kind of bug hides.
@@ -20,11 +22,7 @@ The objective was a reusable backend that stays safe even when the application c
 
 ## System Architecture
 
-<div class="bg-slate-100 p-8 rounded-lg overflow-x-auto text-sm my-8 group">
-	<div class="font-mono text-slate-500 mb-4 transition-opacity group-hover:text-slate-800">
-		[ Client + JWT + X-Workspace-ID ] -> [ FastAPI ] -> [ Session variables ] -> [ PostgreSQL + RLS policies ]
-	</div>
-</div>
+<ArchDiagram id="formcore" />
 
 The service is structured with a hexagonal layout and clear module boundaries. Workspaces are the tenancy boundary: forms, folders and submissions all belong to one, and a user can be a member of several workspaces with a different role in each.
 

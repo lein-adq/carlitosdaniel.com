@@ -1,0 +1,229 @@
+---
+import { diagrams } from "../../data/diagrams";
+import type { DiagramNode, DiagramEdge, Side } from "../../data/diagrams";
+
+interface Props {
+	id: keyof typeof diagrams | string;
+}
+
+const { id } = Astro.props;
+const d = diagrams[id];
+if (!d) throw new Error(`Unknown diagram "${id}"`);
+
+const NW = 128;
+const NH = 64;
+const R = 8;
+const byId = new Map(d.nodes.map((n) => [n.id, n]));
+
+// Text budget: 0.60em sans / 0.62em mono per character (style guide), 8px padding each side.
+for (const n of d.nodes) {
+	if (n.name.length * 13 * 0.6 + 16 > NW) console.warn(`[diagram ${id}] name too long: ${n.name}`);
+	if (n.sub.length * 10 * 0.62 + 16 > NW) console.warn(`[diagram ${id}] sublabel too long: ${n.sub}`);
+}
+
+type Pt = { x: number; y: number };
+
+function port(n: DiagramNode, side: Side, off = 0): Pt {
+	switch (side) {
+		case "r": return { x: n.x + NW, y: n.y + NH / 2 + off };
+		case "l": return { x: n.x, y: n.y + NH / 2 + off };
+		case "t": return { x: n.x + NW / 2 + off, y: n.y };
+		case "b": return { x: n.x + NW / 2 + off, y: n.y + NH };
+	}
+}
+
+const horiz = (s: Side) => s === "l" || s === "r";
+
+/** Orthogonal waypoints between two ports: straight, one bend (L) or two bends (Z). */
+function waypoints(e: DiagramEdge): Pt[] {
+	const a = port(byId.get(e.from)!, e.fs, e.fo ?? 0);
+	const b = port(byId.get(e.to)!, e.ts, e.to_off ?? 0);
+	if (horiz(e.fs) && horiz(e.ts)) {
+		if (a.y === b.y) return [a, b];
+		const mx = (a.x + b.x) / 2;
+		return [a, { x: mx, y: a.y }, { x: mx, y: b.y }, b];
+	}
+	if (!horiz(e.fs) && !horiz(e.ts)) {
+		if (a.x === b.x) return [a, b];
+		const my = (a.y + b.y) / 2;
+		return [a, { x: a.x, y: my }, { x: b.x, y: my }, b];
+	}
+	return horiz(e.fs) ? [a, { x: b.x, y: a.y }, b] : [a, { x: a.x, y: b.y }, b];
+}
+
+const dist = (p: Pt, q: Pt) => Math.abs(p.x - q.x) + Math.abs(p.y - q.y);
+const toward = (from: Pt, to: Pt, by: number): Pt => {
+	const len = dist(from, to);
+	return { x: from.x + ((to.x - from.x) * by) / len, y: from.y + ((to.y - from.y) * by) / len };
+};
+
+/** Polyline with quarter-round corners (r=8). */
+function rounded(pts: Pt[]): string {
+	let path = `M${pts[0].x},${pts[0].y}`;
+	for (let i = 1; i < pts.length - 1; i++) {
+		const r = Math.min(R, dist(pts[i - 1], pts[i]) / 2, dist(pts[i], pts[i + 1]) / 2);
+		const p = toward(pts[i], pts[i - 1], r);
+		const q = toward(pts[i], pts[i + 1], r);
+		path += ` L${p.x},${p.y} Q${pts[i].x},${pts[i].y} ${q.x},${q.y}`;
+	}
+	const last = pts[pts.length - 1];
+	return `${path} L${last.x},${last.y}`;
+}
+
+const labelW = (s: string) => Math.round(s.length * 6.2 + 10);
+
+const edges = d.edges.map((e) => {
+	const pts = waypoints(e);
+	// Label goes on the longest segment, beside it with a visible 6-10px gap.
+	let best = 0;
+	for (let i = 1; i < pts.length; i++) if (dist(pts[i - 1], pts[i]) > dist(pts[best], pts[best + 1] ?? pts[best])) best = i - 1;
+	const [p, q] = [pts[best], pts[best + 1]];
+	let label: { x: number; y: number; w: number; tx: number; ty: number } | null = null;
+	if (e.label) {
+		const w = labelW(e.label);
+		const mx = (p.x + q.x) / 2;
+		const my = (p.y + q.y) / 2;
+		if (p.y === q.y) {
+			label = { x: mx - w / 2, y: my - 19, w, tx: mx, ty: my - 10 };
+		} else {
+			const left = e.labelSide === "l";
+			const x = left ? mx - 8 - w : mx + 8;
+			label = { x, y: my - 6, w, tx: x + w / 2, ty: my + 3 };
+		}
+	}
+	return { e, path: rounded(pts), label };
+});
+
+const legendY = d.height - 28;
+---
+
+<figure class="my-10 overflow-x-auto not-prose" data-diagram={id}>
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox={`0 0 ${d.width} ${d.height}`}
+		role="img"
+		aria-labelledby={`${id}-title ${id}-desc`}
+		class="arch"
+	>
+		<title id={`${id}-title`}>{d.title}</title>
+		<desc id={`${id}-desc`}>{d.desc}</desc>
+		<defs>
+			<marker id={`${id}-arrow`} markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+				<polygon points="0 0, 8 3, 0 6" class="head" />
+			</marker>
+			<marker id={`${id}-arrow-accent`} markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+				<polygon points="0 0, 8 3, 0 6" class="head accent" />
+			</marker>
+		</defs>
+
+		{/* Zones first, then connectors, then nodes: connectors sit behind boxes. */}
+		{(d.zones ?? []).map((z) => (
+			<>
+				<rect x={z.x} y={z.y} width={z.w} height={z.h} rx="8" class="zone" />
+				<rect x={z.x + 12} y={z.y + 4} width={z.label.length * 6.6 + 12} height="14" rx="2" class="mask-zone" />
+				<text x={z.x + 18} y={z.y + 14} class="eyebrow">{z.label}</text>
+			</>
+		))}
+
+		{edges.map(({ e, path, label }) => (
+			<>
+				<path d={path} fill="none" class:list={["edge", { dashed: e.dashed, accent: e.accent }]} marker-end={`url(#${id}-arrow${e.accent ? "-accent" : ""})`} />
+				{label && (
+					<>
+						<rect x={label.x} y={label.y} width={label.w} height="12" rx="2" class="mask" />
+						<text x={label.tx} y={label.ty} class="edge-label" text-anchor="middle">{e.label}</text>
+					</>
+				)}
+			</>
+		))}
+
+		{d.nodes.map((n) => {
+			const kind = n.kind ?? "default";
+			return (
+				<>
+					<rect x={n.x} y={n.y} width={NW} height={NH} rx="6" class="mask" />
+					<rect x={n.x} y={n.y} width={NW} height={NH} rx="6" class:list={["node", kind]} />
+					{kind === "store" && <line x1={n.x} y1={n.y + 10} x2={n.x + NW} y2={n.y + 10} class="cap" />}
+					<text x={n.x + NW / 2} y={n.y + 30} class="name" text-anchor="middle">{n.name}</text>
+					<text x={n.x + NW / 2} y={n.y + 48} class="sub" text-anchor="middle">{n.sub}</text>
+				</>
+			);
+		})}
+
+		{(d.notes ?? []).map((n) => (
+			<text class="note">
+				{n.lines.map((line, i) => <tspan x={n.x} y={n.y + i * 20}>{line}</tspan>)}
+			</text>
+		))}
+
+		<line x1="24" y1={legendY - 12} x2={d.width - 24} y2={legendY - 12} class="rule" />
+		<text x="24" y={legendY + 8} class="eyebrow">LEGEND</text>
+		{d.legend.map((item, i) => {
+			const x = 96 + i * 176;
+			const cy = legendY + 4;
+			return (
+				<>
+					{(item.kind === "solid" || item.kind === "dashed") ? (
+						<line x1={x} y1={cy} x2={x + 20} y2={cy} class:list={["edge", { dashed: item.kind === "dashed" }]} />
+					) : (
+						<rect x={x} y={cy - 6} width="20" height="12" rx="3" class:list={["node", item.kind]} />
+					)}
+					<text x={x + 28} y={cy + 3} class="legend-text">{item.text}</text>
+				</>
+			);
+		})}
+	</svg>
+</figure>
+
+<style is:global>
+	svg.arch {
+		display: block;
+		width: 100%;
+		min-width: 640px;
+		height: auto;
+		font-family: var(--font-sans);
+		--arch-fill: color-mix(in oklab, var(--color-ink) 4%, var(--color-paper));
+		--arch-fill-store: color-mix(in oklab, var(--color-ink) 9%, var(--color-paper));
+		--arch-fill-focal: color-mix(in oklab, var(--color-link) 9%, var(--color-paper));
+	}
+	svg.arch .mask { fill: var(--color-paper); }
+	svg.arch .mask-zone { fill: color-mix(in oklab, var(--color-ink) 3%, var(--color-paper)); }
+	svg.arch .zone {
+		fill: color-mix(in oklab, var(--color-ink) 3%, transparent);
+		stroke: var(--color-rule);
+		stroke-width: 1;
+		stroke-dasharray: 4 3;
+	}
+	svg.arch .rule { stroke: var(--color-rule); stroke-width: 1; }
+	svg.arch .node { fill: var(--arch-fill); stroke: var(--color-ink-soft); stroke-width: 1; }
+	svg.arch .node.store { fill: var(--arch-fill-store); }
+	svg.arch .node.focal { fill: var(--arch-fill-focal); stroke: var(--color-link); stroke-width: 1.5; }
+	svg.arch .node.external { fill: var(--color-paper); stroke-dasharray: 4 3; }
+	svg.arch .cap { stroke: var(--color-ink-soft); stroke-width: 1; opacity: 0.5; }
+	svg.arch .edge { stroke: var(--color-ink-soft); stroke-width: 1.2; }
+	svg.arch .edge.dashed { stroke-dasharray: 5 4; stroke-width: 1.1; }
+	svg.arch .edge.accent { stroke: var(--color-link); }
+	svg.arch .head { fill: var(--color-ink-soft); }
+	svg.arch .head.accent { fill: var(--color-link); }
+	svg.arch .name { fill: var(--color-ink); font-size: 13px; font-weight: 600; }
+	svg.arch .sub { fill: var(--color-muted); font-size: 10px; font-family: var(--font-mono); }
+	svg.arch .eyebrow {
+		fill: var(--color-muted);
+		font-size: 9px;
+		font-family: var(--font-mono);
+		letter-spacing: 0.12em;
+	}
+	svg.arch .edge-label {
+		fill: var(--color-muted);
+		font-size: 9px;
+		font-family: var(--font-mono);
+		letter-spacing: 0.06em;
+	}
+	svg.arch .legend-text { fill: var(--color-ink-soft); font-size: 11px; }
+	svg.arch .note {
+		fill: var(--color-ink-soft);
+		font-family: var(--font-serif);
+		font-style: italic;
+		font-size: 15px;
+	}
+</style>
